@@ -57,7 +57,7 @@ export function Notice() {
                 }
             }
 
-            if (prev.length === 0 && res.data.listres.data.list.length > 0) {
+            if (prev.length === 0 && res.data.list.length > 0) {
                 setHasNews(true);
                 return res.data.list;
             }
