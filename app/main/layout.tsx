@@ -39,7 +39,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (tabs.length == 0) {
-      const home = navMap.get('/dashboard');
+      const home = navMap.get('/dashboard/user-analysis');
 
       if (home) {
         var Component = home.component

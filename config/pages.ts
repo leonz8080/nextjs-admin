@@ -37,8 +37,19 @@ export const sidebarMenu: NavModel[] = [
                 title: 'Dashboard',
                 url: '/dashboard',
                 icon: Gauge,
-                component: dynamic(() => import('@/app/main/dashboard/page')),
-                permissions: ['admin', 'dashboard']
+                items: [
+                    {
+                        title: 'User Analysis',
+                        url: '/dashboard/user-analysis',
+                        component: dynamic(() => import('@/app/main/dashboard/user-analysis/page')),
+                        permissions: ['admin', 'dashboard'],
+                    },
+                    {
+                        title: 'Sales Analysis',
+                        url: '/dashboard/sales-analysis',
+                        permissions: ['admin', 'dashboard'],
+                    },
+                ]
             },
             {
                 title: 'Table',

@@ -57,9 +57,16 @@ export function Notice() {
                 }
             }
 
-            if (prev.length === 0 && res.data.list.length > 0) {
+            if (prev.length === 0 && res.data.listres.data.list.length > 0) {
                 setHasNews(true);
                 return res.data.list;
+            }
+
+            for(var i = 0; i < res.data.list.length; i++) {
+                if(res.data.list[i].status == 0) {
+                    setHasNews(true);
+                    break;
+                }
             }
 
             return prev; 

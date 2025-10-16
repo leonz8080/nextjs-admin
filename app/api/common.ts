@@ -54,7 +54,6 @@ export async function getNotices(input: { [key: string]: any; }) {
 
 export async function getNewNotices(input: { [key: string]: any; }) {
     const where: Prisma.NoticesWhereInput = {
-        status: 0,
         sendTo: { in: [0, input.admin.id] },
     };
 

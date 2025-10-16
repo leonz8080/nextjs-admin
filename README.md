@@ -1,3 +1,5 @@
+🚧 This project is still under development and its functions are not yet complete. Please do not use it in a production environment.
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
