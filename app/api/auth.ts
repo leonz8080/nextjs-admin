@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
 import { prisma } from "../../lib/PrismaClient";
-import crypto from "crypto";
+import { saveBase64Image } from "./common";
 import bcrypt from "bcrypt";
+import { writeFile, mkdir } from "fs/promises";
+import path from "path";
+import { generateToken } from "@/lib/server/jwt";
+
+import { getConfig } from "../../lib/server/global-cache";
 
 export async function login(input: { [key: string]: any; }) {
     const admin = await prisma.admin.findFirst({
@@ -19,10 +24,12 @@ export async function login(input: { [key: string]: any; }) {
 
     let res;
     if (isMatch) {
-        const token = crypto.randomBytes(32).toString("hex");
+        const expires = await getConfig("tokenExpiration");
+        const tokenData = generateToken(admin.id, parseInt(expires));
+
         await prisma.admin.update({
             where: { id: admin.id },
-            data: { token: token },
+            data: { jti: tokenData.jti, tokenHash: tokenData.tokenHash },
         });
         if (admin.name == 'admin') {
             res = NextResponse.json({ result: 0, message: "Login successful!", data: { name: admin.name, avatar: admin.avatar, permissions: ['admin'] } });
@@ -34,7 +41,7 @@ export async function login(input: { [key: string]: any; }) {
             });
             res = NextResponse.json({ result: 0, message: "Login successful!", data: { name: admin.name, avatar: admin.avatar, permissions: permissions } });
         }
-        res.cookies.set("token", token, {
+        res.cookies.set("token", tokenData.token, {
             httpOnly: true,
             secure: true,
             sameSite: "lax",
@@ -48,8 +55,8 @@ export async function login(input: { [key: string]: any; }) {
 
 export async function logout(input: { [key: string]: any; }) {
     await prisma.admin.update({
-        where: { id: input.admin.id },
-        data: { token: "" },
+        where: { id: input.adminId },
+        data: { jti: "", tokenHash: "" },
     });
     return NextResponse.json(
         { result: 0, message: "Logout successful!" },
@@ -69,7 +76,7 @@ export async function checkToken(input: { [key: string]: any; }) {
 export async function updatePassword(input: { [key: string]: any; }) {
     const admin = await prisma.admin.findFirst({
         where: {
-            id: input.admin.id,
+            id: input.adminId,
         },
     })
 
@@ -88,5 +95,53 @@ export async function updatePassword(input: { [key: string]: any; }) {
         data: { password: password },
     });
 
-    return { result: 0, message: "Successful!"};
+    return { result: 0, message: "Successful!" };
+}
+
+export async function getAdmin(input: { [key: string]: any; }) {
+    const admin = await prisma.admin.findFirst({
+        where: {
+            name: input.data.name,
+        },
+    })
+
+    if (!admin) {
+        return { result: 1, message: "User does not exist." };
+    }
+
+    return {
+        result: 0,
+        message: "successful!",
+        data: {
+            name: admin.name,
+            avatar: admin.avatar,
+            email: admin.email,
+            tele: admin.tele,
+            address: admin.address
+        }
+    }
+}
+
+export async function updateAdminBySelf(input: { [key: string]: any; }) {
+    var avatar = '';
+    if (input.data.avatar.startsWith('data:image/png;base64')) {
+        const fileName = `${input.admin.name}.png`;
+        const dir = path.join(process.cwd(), "public", "uploads", input.admin.name);
+        await mkdir(dir, { recursive: true });
+        const filePath = path.join(dir, fileName);
+        saveBase64Image(input.data.avatar, filePath);
+        avatar = `/uploads/${input.admin.name}/${fileName}`;
+    } else {
+        avatar = input.data.avatar
+    }
+    await prisma.admin.update({
+        where: { id: input.adminId },
+        data: {
+            avatar: avatar,
+            email: input.data.email,
+            tele: input.data.tele,
+            address: input.data.address,
+        },
+    });
+    return { result: 0, message: "successful!", data: { avatar: avatar } };
 }

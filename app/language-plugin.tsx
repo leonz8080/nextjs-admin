@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import { NextIntlClientProvider } from 'next-intl';
 import { useLanguageStore } from "@/hooks/use-global-store"
 
-import { languages } from '@/config/language';
+import { languages } from '@/constants/language';
 
 export default function LanguagePlugin({ children }: { children: React.ReactNode }) {
     const { setLanguage } = useLanguageStore();

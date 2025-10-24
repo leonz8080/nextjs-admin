@@ -3,8 +3,12 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { ComponentType } from "react";
+import {
+    type LucideIcon,
+} from "lucide-react";
 
 import * as routes from "@/config/pages"
+import { languages } from '@/constants/language';
 
 export const urlListStore = {
     urlList: new Map<string, string[]>(),
@@ -33,6 +37,7 @@ function loadNav(): Map<string, NavMapModel> {
                         url: v.url,
                         title: v.title,
                         titles: [v.title],
+                        permissions: v.permissions,
                         component: v.component,
                         items: v.items
                     })
@@ -42,6 +47,7 @@ function loadNav(): Map<string, NavMapModel> {
                     url: value.url,
                     title: value.title,
                     titles: [value.title],
+                    permissions: value.permissions,
                     component: value.component,
                     items: value.items
                 })
@@ -54,6 +60,7 @@ function loadNav(): Map<string, NavMapModel> {
                 url: nodes[i].url,
                 title: nodes[i].title,
                 titles: nodes[i].titles,
+                permissions: nodes[i].permissions,
                 component: nodes[i].component,
             })
         }
@@ -63,6 +70,7 @@ function loadNav(): Map<string, NavMapModel> {
                     url: nodes[i].items[j].url,
                     title: nodes[i].items[j].title,
                     titles: nodes[i].titles.concat(nodes[i].items[j].title),
+                    permissions: nodes[i].items[j].permissions,
                     component: nodes[i].items[j].component,
                     items: nodes[i].items[j].items
                 })
@@ -76,6 +84,7 @@ export interface NavMapModel {
     url: string,
     title: string,
     titles: string[],
+    permissions: string[],
     component: ComponentType
 }
 
@@ -106,9 +115,10 @@ export const breadcrumbStateStore = create<BreadcrumbState>()(
 );
 
 interface Tab {
-    key: string; // 路由或唯一标识
+    key: string;
     title: string;
-    component: React.ReactNode; // 页面组件
+    permissions: string[],
+    component: React.ReactNode;
 }
 
 interface TabsState {
@@ -185,17 +195,17 @@ export const userPermissionsStore = create<UserPermissions>()(
             setUserPermissions: (permissions) => set({ permissions }),
         }),
         {
-            name: "userInfo-storage",
+            name: "userPermissions-storage",
             storage: createJSONStorage(() => localStorage),
         }
     )
 );
 
-type Language = 'en' | 'zh' | 'es' | 'fr';
+export type LanguageKey = keyof typeof languages;
 
 interface LanguageState {
-    language: Language;
-    setLanguage: (language: Language) => void;
+    language: LanguageKey;
+    setLanguage: (language: LanguageKey) => void;
 }
 
 export const useLanguageStore = create<LanguageState>()(
@@ -206,7 +216,7 @@ export const useLanguageStore = create<LanguageState>()(
 );
 
 interface HasNewNoticeState {
-    hasNews:  boolean;
+    hasNews: boolean;
     setHasNews: (hasNews: boolean) => void;
 }
 

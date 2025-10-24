@@ -17,7 +17,7 @@ import {
     SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
 
-import { useTabsStore } from "@/hooks/use-global-store";
+import { useTabsStore, navMapStore } from "@/hooks/use-global-store";
 
 import { NavModel } from "@/config/pages"
 
@@ -47,6 +47,7 @@ export function Menu({
 }: {
     item: NavModel
 }) {
+    const { navMap } = navMapStore();
     return (
         <SidebarMenuItem>
             <SidebarMenuButton
@@ -68,7 +69,7 @@ export function MenuCollapsible({
 }: {
     item: NavModel
 }) {
-    const { tabs, activeKey, addTab, setActive, removeTab } = useTabsStore();
+    const { navMap } = navMapStore();
     return (
         <Collapsible
             key={item.title}

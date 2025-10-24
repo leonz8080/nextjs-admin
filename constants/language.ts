@@ -1,3 +1,5 @@
+"use client";
+
 export const languages = {
     en: {
         dashboard: "Dashboard",
@@ -15,4 +17,4 @@ export const languages = {
         dashboard: "tableau de bord",
         new_customers: "Nouveaux clients"
     }
-};
+} as const;

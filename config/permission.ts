@@ -8,18 +8,50 @@ interface PermissionModel {
 export const Permission: PermissionModel[] = [
     {
         key: 'admin',
-        name: 'Admin'
+        name: 'Super Administrator'
     },
     {
-        key: 'adminMng',
-        name: 'Administrator'
+        key: 'userAnalysis',
+        name: 'User Analysis'
     },
     {
-        key: 'role',
-        name: 'Role'
+        key: 'salesAnalysis',
+        name: 'Sales Analysis'
     },
     {
-        key: 'dashboard',
-        name: 'Dashboard'
+        key: 'table',
+        name: 'Table'
+    },
+    {
+        key: 'images',
+        name: 'Images'
+    },
+    {
+        key: 'fileUpload',
+        name: 'File Upload'
+    },
+    {
+        key: 'filePreview',
+        name: 'File Preview'
+    },
+    {
+        key: 'excel',
+        name: 'Excel'
+    },
+    {
+        key: 'adminList',
+        name: 'Admin List'
+    },
+    {
+        key: 'adminRoles',
+        name: 'Admin Roles'
+    },
+    {
+        key: 'adminRoleSwitching',
+        name: 'Admin Role Switching'
+    },
+    {
+        key: 'setting',
+        name: 'Setting'
     }
 ]

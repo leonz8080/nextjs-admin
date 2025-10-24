@@ -1,6 +1,8 @@
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
+import fs from 'fs';
 import { prisma } from "../../lib/PrismaClient";
+import { getConfig, configCache } from "../../lib/server/global-cache";
 import { Prisma } from "@prisma/client";
 
 export async function upload(formData: FormData) {
@@ -24,7 +26,7 @@ export async function upload(formData: FormData) {
 
 export async function getNotices(input: { [key: string]: any; }) {
     const where: Prisma.NoticesWhereInput = {
-        sendTo: { in: [0, input.admin.id] },
+        sendTo: { in: [0, input.adminId] },
     };
     const total = await prisma.notices.count({
         where
@@ -54,7 +56,7 @@ export async function getNotices(input: { [key: string]: any; }) {
 
 export async function getNewNotices(input: { [key: string]: any; }) {
     const where: Prisma.NoticesWhereInput = {
-        sendTo: { in: [0, input.admin.id] },
+        sendTo: { in: [0, input.adminId] },
     };
 
     const list = await prisma.notices.findMany({
@@ -70,4 +72,61 @@ export async function getNewNotices(input: { [key: string]: any; }) {
     })
 
     return { result: 0, message: "successful!", data: { list: list } };
+}
+
+export async function getSysInfo(input: { [key: string]: any; }) {
+    return {
+        result: 0,
+        message: "successful!",
+        data: {
+            name: await getConfig("sysName"),
+            logo: await getConfig("sysLogo"),
+            version: await getConfig("sysVersion"),
+        }
+    };
+}
+
+export async function getAllConfig(input: { [key: string]: any; }) {
+    return {
+        result: 0,
+        message: "successful!",
+        data: {
+            ipWhitelist: await getConfig("ipWhitelist"),
+            tokenExpiration: await getConfig("tokenExpiration"),
+            sysServerTimeZone: await getConfig("sysServerTimeZone"),
+            imageLimit: await getConfig("imageLimit"),
+            sysName: await getConfig("sysName"),
+            sysLogo: await getConfig("sysLogo"),
+            sysVersion: await getConfig("sysVersion"),
+            sysLanguage: await getConfig("sysLanguage"),
+        }
+    };
+}
+
+export async function getDefaultLanguage(input: { [key: string]: any; }) {
+    return {
+        result: 0,
+        message: "successful!",
+        data: {
+            sysLanguage: await getConfig("sysLanguage"),
+        }
+    };
+}
+
+export async function updateConfig(input: { [key: string]: any; }) {
+    for (const key in input.data) {
+        configCache.set(key, input.data[key]);
+        console.log(`Config updated: ${key} = ${input.data[key]}`);
+        await prisma.config.update({
+            where: { name: key },
+            data: { value: String(input.data[key]) }
+        });
+    }
+    return { result: 0, message: "successful!" };
+}
+
+export function saveBase64Image(base64: string, filePath: string) {
+    const base64Data = base64.replace(/^data:image\/\w+;base64,/, '');
+    const buffer = Buffer.from(base64Data, 'base64');
+    fs.writeFileSync(filePath, buffer);
 }

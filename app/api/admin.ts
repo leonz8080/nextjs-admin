@@ -4,7 +4,6 @@ import bcrypt from "bcrypt";
 
 export async function get(input: { [key: string]: any; }) {
     const where: Prisma.AdminWhereInput = {
-        id: { not: 1 },
         ...(input.data.name ? { name: { contains: input.data.name } } : {}),
     };
     const total = await prisma.admin.count({
@@ -20,6 +19,9 @@ export async function get(input: { [key: string]: any; }) {
             id: true,
             name: true,
             avatar: true,
+            tele: true,
+            email: true,
+            address: true,
         },
         where,
         skip: (input.data.pageIndex - 1) * input.data.pageSize,
@@ -47,6 +49,9 @@ export async function insert(input: { [key: string]: any; }) {
                 data: {
                     name: input.data.name,
                     avatar: input.data.avatar,
+                    email: input.data.email,
+                    tele: input.data.tele,
+                    address: input.data.address,
                     password: password
                 },
             });
@@ -72,7 +77,7 @@ export async function update(input: { [key: string]: any; }) {
     if (input.data.id == 1) {
         return { result: 1, message: "fail!" };
     }
-    
+
     const admin = await prisma.admin.findFirst({
         where: {
             name: input.data.name,
@@ -105,12 +110,25 @@ export async function update(input: { [key: string]: any; }) {
                 const password = await bcrypt.hash(input.data.password, 10);
                 await tx.admin.update({
                     where: { id: input.data.id },
-                    data: { name: input.data.name, avatar: input.data.avatar, password: password },
+                    data: {
+                        name: input.data.name,
+                        avatar: input.data.avatar,
+                        email: input.data.email,
+                        tele: input.data.tele,
+                        address: input.data.address,
+                        password: password
+                    },
                 });
             } else {
                 await tx.admin.update({
                     where: { id: input.data.id },
-                    data: { name: input.data.name, avatar: input.data.avatar },
+                    data: {
+                        name: input.data.name,
+                        avatar: input.data.avatar,
+                        email: input.data.email,
+                        tele: input.data.tele,
+                        address: input.data.address,
+                    },
                 });
             }
         });

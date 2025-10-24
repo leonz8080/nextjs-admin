@@ -36,6 +36,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDes
 import { number, z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import { DeleteConfirmDialog } from "@/components/common/delete-confirm-dialog"
 import { DataTable, DataPagination, DataTableRef } from "@/components/layout/data-table"
 import AvatarUploader from "@/components/layout/avatar-uploader";
 import { request } from "@/lib/client/utils"
@@ -44,6 +45,9 @@ interface Admin {
     id: number;
     avatar: string;
     name: string;
+    email: string;
+    tele: string;
+    address: string;
     password: string;
     roles: string[];
 }
@@ -63,6 +67,8 @@ export default function AdminList() {
     const [roles, setRoles] = useState<Role[]>([]);
     const [open, setOpen] = React.useState(false);
     const [operTyp, setOperTyp] = useState("insert");
+    const [delOpen, setDelOpen] = React.useState(false);
+    var delId = React.useRef(0);
 
     const tableRef = useRef<DataTableRef<Admin>>(null);
 
@@ -70,6 +76,9 @@ export default function AdminList() {
         id: z.number(),
         avatar: z.string(),
         name: z.string().min(1, "名称必填"),
+        email: z.string(),
+        tele: z.string(),
+        address: z.string(),
         password: z.string().refine((val) => {
             if (operTyp === "insert" && val.length < 6) {
                 return false;
@@ -91,6 +100,9 @@ export default function AdminList() {
             id: 0,
             avatar: "",
             name: "",
+            email: "",
+            tele: "",
+            address: "",
             password: "",
             roles: []
         },
@@ -117,7 +129,10 @@ export default function AdminList() {
         form.setValue("id", 0);
         form.setValue("avatar", '/unAuth.png');
         form.setValue("name", '');
+        form.setValue("email", '');
+        form.setValue("tele", '');
         form.setValue("password", '');
+        form.setValue("address", '');
         form.setValue("roles", []);
         var res = await request('getAllRoles', {});
         setRoles(res.data?.list || []);
@@ -150,6 +165,9 @@ export default function AdminList() {
     async function handleUpdate(admin: Admin) {
         form.setValue("id", admin.id);
         form.setValue("name", admin.name);
+        form.setValue("email", admin.email);
+        form.setValue("tele", admin.tele);
+        form.setValue("address", admin.address);
         form.setValue("password", '');
         var res = await request('getAllRoles', {});
         setRoles(res.data?.list || []);
@@ -180,17 +198,24 @@ export default function AdminList() {
         }
     }
 
-    async function del(id: number) {
+    async function handleDelete(id: number) {
+        delId.current = id;
+        setDelOpen(true);
+    }
+
+    async function del() {
         var res = await request('deleteAdmin', {
-            id: id
+            id: delId.current
         });
 
         if (res.result != 0 || !res.data) {
+            setDelOpen(false);
             toast.error(res.message)
             return
         }
 
         get();
+        setDelOpen(false);
         toast.success(res.message)
     }
 
@@ -220,23 +245,52 @@ export default function AdminList() {
                     <span className="ml-2">{row.original.name}</span>
                 </div>
             ),
-            meta: { className: "w-full text-left" },
+            meta: { className: "min-w-[200px] text-left" },
+        },
+        {
+            accessorKey: "email",
+            header: "Email",
+            cell: ({ row }) => (
+                <span>{row.original.email}</span>
+            ),
+            meta: { className: "min-w-[200px] text-left" },
+        },
+        {
+            accessorKey: "tele",
+            header: "Tele",
+            cell: ({ row }) => (
+                <span>{row.original.tele}</span>
+            ),
+            meta: { className: "min-w-[100px] text-left" },
+        },
+        {
+            accessorKey: "address",
+            header: "Address",
+            cell: ({ row }) => (
+                <span>{row.original.address}</span>
+            ),
+            meta: { className: "flex-1 text-left" },
         },
         {
             id: "actions",
             header: "Actions",
-            cell: ({ row }) => (
-                <>
-                    <Button variant="outline" className="ml-2" size="sm" onClick={() => handleUpdate(row.original)}>
-                        <Pencil />
-                        <span className="hidden lg:inline">Update</span>
-                    </Button>
-                    <Button variant="outline" className="ml-2" size="sm" onClick={() => del(row.original.id)}>
-                        <Trash2 />
-                        <span className="hidden lg:inline">Delete</span>
-                    </Button>
-                </>
-            ),
+            cell: ({ row }) => {
+                if (row.original.id !== 1) {
+                    return (
+                        <>
+                            <Button variant="outline" className="ml-2" size="sm" onClick={() => handleUpdate(row.original)}>
+                                <Pencil />
+                                <span className="hidden lg:inline">Update</span>
+                            </Button>
+                            <Button variant="outline" className="ml-2" size="sm" onClick={() => handleDelete(row.original.id)}>
+                                <Trash2 />
+                                <span className="hidden lg:inline">Delete</span>
+                            </Button>
+                        </>
+                    )
+                }
+            },
+            meta: { className: "min-w-[180px] text-left" },
         },
     ]
 
@@ -307,6 +361,51 @@ export default function AdminList() {
                             <div className="grid gap-3">
                                 <FormField
                                     control={form.control}
+                                    name="email"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Email</FormLabel>
+                                            <FormControl>
+                                                <Input type="email" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                            <div className="grid gap-3">
+                                <FormField
+                                    control={form.control}
+                                    name="tele"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Tele</FormLabel>
+                                            <FormControl>
+                                                <Input type="text" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                            <div className="grid gap-3">
+                                <FormField
+                                    control={form.control}
+                                    name="address"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Address</FormLabel>
+                                            <FormControl>
+                                                <Input type="text" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                            <div className="grid gap-3">
+                                <FormField
+                                    control={form.control}
                                     name="password"
                                     render={({ field }) => (
                                         <FormItem>
@@ -363,6 +462,7 @@ export default function AdminList() {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+            <DeleteConfirmDialog open={delOpen} onConfirm={() => {del();}} onClose={() => { setDelOpen(false) }} />
         </>
     );
 }

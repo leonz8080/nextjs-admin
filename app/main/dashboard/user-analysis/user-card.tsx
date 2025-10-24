@@ -9,29 +9,36 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
-import { IconTrendingDown } from "@tabler/icons-react"
+import { IconTrendingDown, IconTrendingUp } from "@tabler/icons-react"
 import { useTranslations } from 'next-intl';
 
-export function DataCard() {
+export interface CardDataModel {
+    title: string,
+    amount: string,
+    unit: string,
+    margin: number
+}
+
+export function UserCard({ data }: { data: CardDataModel }) {
     const t = useTranslations();
 
     return (
         <Card className="@container/card">
             <CardHeader>
-                <CardDescription>{t('new_customers')}</CardDescription>
+                <CardDescription>{data.title}</CardDescription>
                 <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-                    1,234
+                    {data.amount}
                 </CardTitle>
                 <CardAction>
                     <Badge variant="outline">
                         <IconTrendingDown />
-                        -20%
+                        {data.margin}%
                     </Badge>
                 </CardAction>
             </CardHeader>
             <CardFooter className="flex-col items-start gap-1.5 text-sm">
                 <div className="line-clamp-1 flex gap-2 font-medium">
-                    Down 20% this period <IconTrendingDown className="size-4" />
+                    {data.margin < 0 ? 'Down ' + (data.margin * -1) : 'Up ' + data.margin}% this {data.unit} {data.margin < 0 ? <IconTrendingDown className="size-4" /> : <IconTrendingUp className="size-4" />}
                 </div>
                 {/*<div className="text-muted-foreground">
                     Acquisition needs attention

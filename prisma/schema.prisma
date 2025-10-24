@@ -18,7 +18,11 @@ model Admin {
   name         String
   password     String
   avatar       String?
-  token        String?
+  email        String?
+  tele         String?
+  address      String?
+  jti          String?
+  tokenHash    String?
 }
 
 model Roles {
@@ -57,4 +61,10 @@ model Notices {
   content      String
   status       Int
   createAt     String
+}
+
+model Config {
+  id           Int    @id @default(autoincrement())
+  name         String @unique
+  value        String
 }

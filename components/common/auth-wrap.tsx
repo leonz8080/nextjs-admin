@@ -2,7 +2,7 @@
 
 import { userPermissionsStore } from "@/hooks/use-global-store";
 
-export function Auth({
+export function AuthWrap({
     permission,
     children,
 }: {
@@ -20,6 +20,6 @@ export function Auth({
     return allowed ? <>{children}</> : null;
 }
 
-/*<Auth permission={["admin", "manager"]}>
+/*<AuthWrap permission={["admin", "manager"]}>
 ...
-</Auth>*/
+</AuthWrap>*/

@@ -1,27 +1,32 @@
 import { prisma } from "../../lib/PrismaClient";
 
 interface AdminModel {
-  id: Number,
-  name: string,
+  jti: string,
+  tokenHash: string,
   permissions: string[]
 }
 
 declare global {
   // 在 TypeScript 中声明 globalThis 类型
-  var adminCache: Map<string, AdminModel>;
+  var adminCache: Map<number, AdminModel>;
+  var configCache: Map<string, string>;
 }
 
 if (!globalThis.adminCache) {
   globalThis.adminCache = new Map();
 }
 
+if (!globalThis.configCache) {
+  globalThis.configCache = new Map();
+}
+
 export const adminCache = globalThis.adminCache;
 
-export async function getAdmin(token: string): Promise<AdminModel | undefined> {
-  if (!globalThis.adminCache.get(token)) {
+export async function getAdmin(id: number): Promise<AdminModel | undefined> {
+  if (!globalThis.adminCache.get(id)) {
     const admin = await prisma.admin.findFirst({
       where: {
-        token: token,
+        id: id,
       },
     })
     if (!admin) {
@@ -34,12 +39,26 @@ export async function getAdmin(token: string): Promise<AdminModel | undefined> {
       permissions.push(v.permission);
     });
 
-    globalThis.adminCache.set(token, {
-      id: admin.id,
-      name: admin.name,
+    globalThis.adminCache.set(id, {
+      jti: admin.jti ?? '',
+      tokenHash: admin.tokenHash ?? '',
       permissions: permissions
     });
   }
 
-  return globalThis.adminCache.get(token);
+  return globalThis.adminCache.get(id);
+}
+
+export const configCache = globalThis.configCache;
+
+export async function getConfig(name: string): Promise<string> {
+  if (!globalThis.configCache.get(name)) {
+    console.log("Loading config from database:", name);
+    const config = await prisma.config.findMany();
+    config.forEach((v) => {
+      globalThis.configCache.set(v.name, v.value);
+    });
+  }
+
+  return globalThis.configCache.get(name) ?? "";
 }

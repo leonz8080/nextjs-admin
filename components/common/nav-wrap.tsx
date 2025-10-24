@@ -35,6 +35,7 @@ export const NavA = forwardRef<HTMLAnchorElement, NavAProps>(
                     addTab({
                         key: nav.url,
                         title: nav.title,
+                        permissions: nav.permissions,
                         component: <Component />,
                     });
                 }
@@ -77,6 +78,7 @@ export const NavDropdownMenu = forwardRef<HTMLDivElement, NavDropdownMenuProps>(
                     addTab({
                         key: nav.url,
                         title: nav.title,
+                        permissions: nav.permissions,
                         component: <Component />,
                     });
                 }
@@ -117,6 +119,7 @@ export const NavCommand = forwardRef<HTMLDivElement, NavCommandProps>(
                     addTab({
                         key: nav.url,
                         title: nav.title,
+                        permissions: nav.permissions,
                         component: <Component />,
                     });
                 }

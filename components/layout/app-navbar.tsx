@@ -1,15 +1,28 @@
 "use client"
 
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from 'react'
+
 import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
 import { X } from "lucide-react"
 
-import { useTabsStore } from "@/hooks/use-global-store";
+import { useTabsStore, userPermissionsStore } from "@/hooks/use-global-store";
 
 export function AppNavbar() {
-    const router = useRouter();
     const { tabs, activeKey, setActive, removeTab } = useTabsStore();
+    const { permissions } = userPermissionsStore();
+
+    useEffect(() => {
+        for (var i = 0; i < tabs.length; i++) {
+            if (!tabs[i].permissions || tabs[i].permissions.length == 0) {
+                continue;
+            }
+            if (!tabs[i].permissions?.some(item => permissions.includes(item))) {
+                removeTab(tabs[i].key);
+                i--;
+            }
+        }
+    }, [permissions]);
 
     return (
         <>
@@ -25,7 +38,7 @@ export function AppNavbar() {
                                     className="bg-blue-500 text-white dark:bg-blue-600 rounded-none ml-1"
                                 >
                                     <span>{tab.title}</span>
-                                    {tabs.length > 1 && <span className="cursor-pointer" onClick={(e) => { e.stopPropagation(); removeTab(tab.key); }}><X size={12}/></span>}
+                                    {tabs.length > 1 && <span className="cursor-pointer" onClick={(e) => { e.stopPropagation(); removeTab(tab.key); }}><X size={12} /></span>}
                                 </Badge>
                             )
                         else
@@ -36,7 +49,7 @@ export function AppNavbar() {
                                     className="rounded-none ml-1"
                                 >
                                     <span className="cursor-pointer" onClick={() => { setActive(tab.key); }}>{tab.title}</span>
-                                    {tabs.length > 1 && <span className="cursor-pointer" onClick={(e) => { e.stopPropagation(); removeTab(tab.key); }}><X size={12}/></span>}
+                                    {tabs.length > 1 && <span className="cursor-pointer" onClick={(e) => { e.stopPropagation(); removeTab(tab.key); }}><X size={12} /></span>}
                                 </Badge>
                             )
                     })

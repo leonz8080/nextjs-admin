@@ -32,6 +32,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { DataTable, DataPagination, DataTableRef } from "@/components/layout/data-table"
+import { DeleteConfirmDialog } from "@/components/common/delete-confirm-dialog"
 import { Permission } from "@/config/permission"
 
 import { request } from "@/lib/client/utils"
@@ -51,6 +52,8 @@ export default function Roles() {
     const [name, setName] = useState("");
     const [open, setOpen] = React.useState(false);
     const [operTyp, setOperTyp] = useState("insert");
+    const [delOpen, setDelOpen] = React.useState(false);
+    var delId = React.useRef(0);
 
     const tableRef = useRef<DataTableRef<Role>>(null);
 
@@ -150,17 +153,24 @@ export default function Roles() {
         }
     }
 
-    async function del(id: number) {
-        var res = await request('deleteRole', {
-            id: id
-        });
+    async function handleDelete(id: number) {
+        delId.current = id;
+        setDelOpen(true);
+    }
 
+    async function del() {
+        var res = await request('deleteRole', {
+            id: delId.current
+        });
+        
         if (res.result != 0 || !res.data) {
+            setDelOpen(false);
             toast.error(res.message)
             return
         }
 
         get();
+        setDelOpen(false);
         toast.success(res.message)
     }
 
@@ -193,7 +203,7 @@ export default function Roles() {
                         <Pencil />
                         <span className="hidden lg:inline">Update</span>
                     </Button>
-                    <Button variant="outline" className="ml-2" size="sm" onClick={() => del(row.original.id)}>
+                    <Button variant="outline" className="ml-2" size="sm" onClick={() => handleDelete(row.original.id)}>
                         <Trash2 />
                         <span className="hidden lg:inline">Delete</span>
                     </Button>
@@ -293,6 +303,7 @@ export default function Roles() {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+            <DeleteConfirmDialog open={delOpen} onConfirm={() => {del();}} onClose={() => { setDelOpen(false) }} />
         </>
     );
 }

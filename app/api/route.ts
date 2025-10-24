@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "../../lib/PrismaClient";
 import { routes } from "@/config/route";
 import { getAdmin } from "@/lib/server/global-cache";
+import { verifyToken, hashToken } from "@/lib/server/jwt";
 
 var routeCache: { [key: string]: any; } = {};
 
@@ -25,7 +26,7 @@ async function jsonRequest(req: Request) {
         return NextResponse.json({ result: 1, message: "Invalid API route." });
     }
 
-    if (input.url !== "login") {
+    if (input.url !== "login" && input.url !== "getDefaultLanguage") {
         const cookieHeader = req.headers.get("cookie") || "";
         const token = cookieHeader
             .split("; ")
@@ -36,8 +37,8 @@ async function jsonRequest(req: Request) {
             return NextResponse.json({ result: 2, message: "Not authenticated." });
         }
 
-        const admin = await getAdmin(token);
-        if (!admin) {
+        const decoded = verifyToken(token);
+        if (!decoded) {
             return NextResponse.json(
                 { result: 2, message: "Token error." },
                 {
@@ -49,7 +50,28 @@ async function jsonRequest(req: Request) {
             );
         }
 
-        input.admin = admin;
+        const tokenHash = hashToken(token);
+        const admin = await getAdmin(decoded.adminId);
+
+        if (!admin || admin.jti !== decoded.jti || admin.tokenHash !== tokenHash) {
+            return NextResponse.json(
+                { result: 2, message: "Token error." },
+                {
+                    status: 200,
+                    headers: {
+                        "Set-Cookie": "token=; Path=/; HttpOnly; Max-Age=0"
+                    },
+                }
+            );
+        }
+
+        if (decoded.adminId !== 1) {
+            if (route.permissions && !route.permissions?.some(item => admin.permissions.includes(item))) {
+                return NextResponse.json({ result: 403, message: "No permission for this request." });
+            }
+        }
+
+        input.adminId = decoded.adminId;
     }
 
     if (input.url in routeCache) {
@@ -92,7 +114,8 @@ async function formDataRequest(req: Request) {
         return NextResponse.json({ result: 2, message: "Not authenticated." });
     }
 
-    if (!getAdmin(token)) {
+    const decoded = verifyToken(token);
+    if (!decoded) {
         return NextResponse.json(
             { result: 2, message: "Token error." },
             {
@@ -104,8 +127,10 @@ async function formDataRequest(req: Request) {
         );
     }
 
-    const admin = await getAdmin(token);
-    if(!admin) {
+    const tokenHash = hashToken(token);
+    const admin = await getAdmin(decoded.adminId);
+
+    if (!admin || admin.jti !== decoded.jti || admin.tokenHash !== tokenHash) {
         return NextResponse.json(
             { result: 2, message: "Token error." },
             {
@@ -117,8 +142,13 @@ async function formDataRequest(req: Request) {
         );
     }
 
-    formData.append('adminId', String(admin?.id ?? ""));
-    formData.append('adminName', String(admin?.name ?? ""));
+    if (decoded.adminId !== 1) {
+        if (route.permissions && !route.permissions?.some(item => admin.permissions.includes(item))) {
+            return NextResponse.json({ result: 403, message: "No permission for this request." });
+        }
+    }
+
+    formData.append('adminId', String(decoded.adminId));
 
     if (String(formData.get("url")) in routeCache) {
         const res = await routeCache[String(formData.get("url"))](formData);

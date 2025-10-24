@@ -118,7 +118,7 @@ export function AdminMenu() {
                         <span>{userInfo?.name || 'Uncertified'}</span>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <NavDropdownMenu navKey='profile'>
+                    <NavDropdownMenu navKey='/profile'>
                         <UserRoundPen />
                         <span>Profile</span>
                     </NavDropdownMenu>

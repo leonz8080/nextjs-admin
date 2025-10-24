@@ -21,11 +21,10 @@ import {
 } from "@/components/ui/card"
 
 import { request } from "@/lib/client/utils";
-import { useUserInfoStore, userPermissionsStore } from "@/hooks/use-global-store";
+import { useUserInfoStore, userPermissionsStore, useLanguageStore } from "@/hooks/use-global-store";
 import { NextIntlClientProvider } from 'next-intl';
-import { useLanguageStore } from "@/hooks/use-global-store"
 
-import { languages } from '@/config/language';
+import { languages } from '@/constants/language';
 
 const schema = z.object({
     name: z.string().min(1, "用户名必填").regex(/^[A-Za-z0-9]+$/, "只能包含数字和大小写字母"),
@@ -40,8 +39,38 @@ export default function Login() {
     const { setUserPermissions } = userPermissionsStore();
     const { setLanguage } = useLanguageStore();
 
+    function getDefaultLanguage() {
+        request('getDefaultLanguage', {}).then((res) => {
+            if (res.result === 0 && res.data) {
+                var lang = res.data.sysLanguage;
+                if (lang === 'browser') {
+                    if (typeof navigator !== 'undefined') {
+                        lang = navigator.language.toLowerCase();
+                        if (lang.indexOf('-') > 0) {
+                            lang = lang.substring(0, lang.indexOf('-'));
+                        }
+                    }
+                    if (lang in languages) {
+                        setLanguage(lang);
+                    } else {
+                        setLanguage('en');
+                    }
+                } else {
+                    if (lang in languages) {
+                        setLanguage(lang);
+                    } else {
+                        setLanguage('en');
+                    }
+                }
+            } else {
+                setLanguage('en');
+            }
+        })
+    }
+
     useEffect(() => {
-        if (typeof navigator !== 'undefined') {
+        getDefaultLanguage();
+        /*if (typeof navigator !== 'undefined') {
             var lang = navigator.language.toLowerCase();
             if (lang.indexOf('-') > 0) {
                 lang = lang.substring(0, lang.indexOf('-'));
@@ -51,7 +80,7 @@ export default function Login() {
             } else {
                 setLanguage('en');
             }
-        }
+        }*/
     }, []);
 
     const form = useForm<FormData>({
@@ -127,9 +156,6 @@ export default function Login() {
                                             <div className="flex flex-col gap-3">
                                                 <Button type="button" className="w-full" onClick={handleSubmit}>
                                                     Login
-                                                </Button>
-                                                <Button variant="outline" className="w-full">
-                                                    Login with Google
                                                 </Button>
                                             </div>
                                         </div>

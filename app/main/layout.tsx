@@ -15,37 +15,34 @@ import { AppNavbar } from "@/components/layout/app-navbar"
 import { BreadcrumbExt } from "@/components/layout/breadcrumb-ext"
 import { AppSearchBar } from "@/components/layout/app-searchbar"
 
-import { useTabsStore, NavMapModel, navMapStore, breadcrumbStateStore } from "@/hooks/use-global-store"
+import { useTabsStore, useLanguageStore, navMapStore, breadcrumbStateStore, userPermissionsStore } from "@/hooks/use-global-store"
+import { firstPageUrl } from "@/config/pages"
 
 import { Language } from "./language";
 import { AdminMenu } from "./admin-menu";
 import { Notice } from "./notice";
 
-import { Button } from "@/components/ui/button"
-import {
-  Bell
-} from "lucide-react"
-
-
 import { NextIntlClientProvider } from 'next-intl';
-import { useLanguageStore } from "@/hooks/use-global-store"
 
-import { languages } from '@/config/language';
+import { languages } from '@/constants/language';
+import { request } from "@/lib/client/utils";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { tabs, activeKey, setActive, removeTab, addTab } = useTabsStore();
   const { setLanguage, language } = useLanguageStore();
   const { navMap } = navMapStore();
+  const { permissions } = userPermissionsStore();
 
   useEffect(() => {
     if (tabs.length == 0) {
-      const home = navMap.get('/dashboard/user-analysis');
+      const firstPage = navMap.get(firstPageUrl);
 
-      if (home) {
-        var Component = home.component
+      if (firstPage) {
+        var Component = firstPage.component
         addTab({
-          key: home.url,
-          title: home.title,
+          key: firstPage.url,
+          title: firstPage.title,
+          permissions: firstPage.permissions,
           component: <Component />,
         });
 
@@ -62,18 +59,37 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     }
   }, [activeKey]);
 
-  useEffect(() => {
-    if (typeof navigator !== 'undefined') {
-      var lang = navigator.language.toLowerCase();
-      if (lang.indexOf('-') > 0) {
-        lang = lang.substring(0, lang.indexOf('-'));
-      }
-      if (lang === 'zh' || lang === 'en' || lang === 'es' || lang === 'fr') {
-        setLanguage(lang);
+  function getDefaultLanguage() {
+    request('getDefaultLanguage', {}).then((res) => {
+      if (res.result === 0 && res.data) {
+        var lang = res.data.sysLanguage;
+        if (lang === 'browser') {
+          if (typeof navigator !== 'undefined') {
+            lang = navigator.language.toLowerCase();
+            if (lang.indexOf('-') > 0) {
+              lang = lang.substring(0, lang.indexOf('-'));
+            }
+          }
+          if (lang in languages) {
+            setLanguage(lang);
+          } else {
+            setLanguage('en');
+          }
+        } else {
+          if (lang in languages) {
+            setLanguage(lang);
+          } else {
+            setLanguage('en');
+          }
+        }
       } else {
         setLanguage('en');
       }
-    }
+    })
+  }
+
+  useEffect(() => {
+    getDefaultLanguage();
   }, []);
 
   return (

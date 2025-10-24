@@ -7,13 +7,10 @@ import {
     Table,
     Settings,
     UserRoundCog,
-    ChartColumnIncreasing,
-    Puzzle,
     File,
     Bell,
     Bug,
     UserRoundPen,
-    KeyRound,
     Image,
     type LucideIcon,
 } from "lucide-react";
@@ -27,6 +24,8 @@ export interface NavModel {
     component?: ComponentType,
     items?: NavModel[],
 }
+
+export const firstPageUrl = "/dashboard/user-analysis";
 
 export const sidebarMenu: NavModel[] = [
     {
@@ -42,12 +41,13 @@ export const sidebarMenu: NavModel[] = [
                         title: 'User Analysis',
                         url: '/dashboard/user-analysis',
                         component: dynamic(() => import('@/app/main/dashboard/user-analysis/page')),
-                        permissions: ['admin', 'dashboard'],
+                        permissions: ['admin', 'userAnalysis'],
                     },
                     {
                         title: 'Sales Analysis',
                         url: '/dashboard/sales-analysis',
-                        permissions: ['admin', 'dashboard'],
+                        component: dynamic(() => import('@/app/main/dashboard/sales-analysis/page')),
+                        permissions: ['admin', 'salesAnalysis'],
                     },
                 ]
             },
@@ -63,27 +63,30 @@ export const sidebarMenu: NavModel[] = [
                 url: '/images',
                 icon: Image,
                 component: dynamic(() => import('@/app/main/images/page')),
-                permissions: ['admin', 'image']
+                permissions: ['admin', 'images']
             },
             {
                 title: 'File',
-                url: 'file',
+                url: '/file',
                 icon: File,
                 items: [
                     {
                         title: 'Upload',
                         url: '/file/upload',
-                        permissions: ['admin', 'file-upload']
+                        component: dynamic(() => import('@/app/main/file/upload/page')),
+                        permissions: ['admin', 'fileUpload']
                     },
                     {
                         title: 'Preview',
                         url: '/file/preview',
-                        permissions: ['admin', 'file-preview']
+                        component: dynamic(() => import('@/app/main/file/preview/page')),
+                        permissions: ['admin', 'filePreview']
                     },
                     {
                         title: 'Excel',
                         url: '/file/excel',
-                        permissions: ['admin', 'file-export']
+                        component: dynamic(() => import('@/app/main/file/excel/page')),
+                        permissions: ['admin', 'excel']
                     }
                 ]
             }
@@ -102,32 +105,27 @@ export const sidebarMenu: NavModel[] = [
                         title: 'List',
                         url: '/admin/list',
                         component: dynamic(() => import('@/app/main/admin/list/page')),
-                        permissions: ['admin', 'admin-list']
+                        permissions: ['admin', 'adminList']
                     },
                     {
                         title: 'Roles',
                         url: '/admin/roles',
                         component: dynamic(() => import('@/app/main/admin/roles/page')),
-                        permissions: ['admin', 'admin-roles']
+                        permissions: ['admin', 'adminRoles']
                     },
                     {
                         title: 'Role Switching',
                         url: '/admin/role-switching',
-                        permissions: ['admin', 'admin-role-switching']
+                        component: dynamic(() => import('@/app/main/admin/role-switching/page')),
+                        permissions: ['admin', 'adminRoleSwitching']
                     }
                 ]
-            },
-            {
-                title: 'Notice',
-                url: '/notice',
-                icon: Bell,
-                component: dynamic(() => import('@/app/main/notices/page')),
-                permissions: ['admin', 'notice']
             },
             {
                 title: 'Setting',
                 url: '/setting',
                 icon: Settings,
+                component: dynamic(() => import('@/app/main/setting/page')),
                 permissions: ['admin', 'setting']
             },
             {
@@ -138,17 +136,14 @@ export const sidebarMenu: NavModel[] = [
                     {
                         title: '403',
                         url: '/error-page/p403',
-                        permissions: ['admin', 'error-page-403']
+                        component: dynamic(() => import('@/app/main/error-page/p403/page')),
+                        permissions: ['admin', 'errorPage403']
                     },
                     {
                         title: '404',
                         url: '/error-page/p404',
-                        permissions: ['admin', 'error-page-404']
-                    },
-                    {
-                        title: '500',
-                        url: '/error-page/p500',
-                        permissions: ['admin', 'error-page-500']
+                        component: dynamic(() => import('@/app/main/error-page/p404/page')),
+                        permissions: ['admin', 'errorPage404']
                     }
                 ]
             }
@@ -156,9 +151,16 @@ export const sidebarMenu: NavModel[] = [
     }
 ];
 
+export const notice: NavModel = {
+    title: 'Notice',
+    icon: Bell,
+    url: '/notice',
+    component: dynamic(() => import('@/app/main/admin/profile/page')),
+}
+
 export const profile: NavModel = {
     title: 'Profile',
     icon: UserRoundPen,
-    url: '/admin/profile',
+    url: '/profile',
     component: dynamic(() => import('@/app/main/admin/profile/page')),
 }

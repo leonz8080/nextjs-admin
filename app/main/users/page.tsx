@@ -44,10 +44,11 @@ import {
 } from "@/components/ui/popover"
 import { Switch } from "@/components/ui/switch"
 
+import { DeleteConfirmDialog } from "@/components/common/delete-confirm-dialog"
 import { DataTable, DataPagination, DataTableRef } from "@/components/layout/data-table"
 
 import { number, z } from "zod";
-import dayjs from "dayjs";
+import { formatDateTime } from "@/lib/server/time";
 
 import { request, download } from "@/lib/client/utils"
 
@@ -91,6 +92,9 @@ export default function Users() {
     const [level, setLevel] = useState("");
     const [name, setName] = useState("");
 
+    const [delOpen, setDelOpen] = React.useState(false);
+    var delIds = React.useRef<number[]>([]);
+
     const tableRef = useRef<DataTableRef<User>>(null);
 
     async function get() {
@@ -127,15 +131,32 @@ export default function Users() {
         toast.success(res.message)
     }
 
-    async function del(id: number[]) {
+    async function handleDelete(id: number) {
+        delIds.current = [id];
+        setDelOpen(true);
+    }
+
+    async function handleDeletes() {
+        const selected = tableRef.current?.getSelectedRows() || [];
+        var ids: number[] = [];
+        selected.map((v, i) => (
+            ids.push(v.id)
+        ))
+        delIds.current = ids;
+        setDelOpen(true);
+    }
+
+    async function del() {
         var res = await request('deleteUsers', {
-            id: id
+            id: delIds.current
         });
 
         if (res.result != 0 || !res.data) {
+            setDelOpen(false);
             toast.error(res.message)
             return
         }
+        setDelOpen(false);
         toast.success(res.message)
     }
 
@@ -148,25 +169,6 @@ export default function Users() {
         setPageSize(pageSize);
         setPageIndex(1);
         get();
-    }
-
-    async function delSelect() {
-        const selected = tableRef.current?.getSelectedRows() || [];
-        console.log(selected);
-        var ids: number[] = [];
-        selected.map((v, i) => (
-            ids.push(v.id)
-        ))
-
-        var res = await request('deleteUsers', {
-            id: ids
-        });
-
-        if (res.result != 0 || !res.data) {
-            toast.error(res.message)
-            return
-        }
-        toast.success(res.message)
     }
 
     function downloadExcel() {
@@ -295,7 +297,7 @@ export default function Users() {
                                         setDate(date)
                                         setValue(formatDate(date))
                                         setOpen(false)
-                                        date && update(row.original.id, 'expiration', dayjs(date).format("YYYY-MM-DD"))
+                                        date && update(row.original.id, 'expiration', formatDateTime(date, 'yyyy-MM-dd'))
                                     }}
                                 />
                             </PopoverContent>
@@ -355,7 +357,7 @@ export default function Users() {
             id: "actions",
             header: "Actions",
             cell: ({ row }) => (
-                <Button variant="outline" className="ml-2" size="sm" onClick={() => del([row.original.id])}>
+                <Button variant="outline" className="ml-2" size="sm" onClick={() => handleDelete(row.original.id)}>
                     <Trash2 />
                     <span className="hidden lg:inline">Delete</span>
                 </Button>
@@ -368,38 +370,41 @@ export default function Users() {
     }, []);
 
     return (
-        <div className="flex flex-1 flex-col">
-            <div className="@container/main flex flex-1 flex-col gap-2">
-                <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-                    <div className="flex px-4 lg:px-6">
-                        <Select defaultValue={''} onValueChange={(s) => setLevel(s)}>
-                            <SelectTrigger size="sm">
-                                <SelectValue placeholder="User Level" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {userLevel.map((item) => {
-                                    return <SelectItem value={item}>{item}</SelectItem>
-                                })}
-                            </SelectContent>
-                        </Select>
-                        <Input type="text" placeholder="Name" className="w-40 ml-2 h-8 text-sm" onChange={(e) => setName(e.target.value)} />
-                        <Button variant="outline" className="ml-2" size="sm" onClick={get}>
-                            <Search />
-                            <span className="hidden lg:inline">Query</span>
-                        </Button>
-                        <Button variant="outline" className="ml-2" size="sm" onClick={delSelect}>
-                            <Trash2 />
-                            <span className="hidden lg:inline">Delete</span>
-                        </Button>
-                        <Button variant="outline" className="ml-2" size="sm" onClick={downloadExcel}>
-                            <ArrowDownToLine />
-                            <span className="hidden lg:inline">Export Excel</span>
-                        </Button>
+        <>
+            <div className="flex flex-1 flex-col">
+                <div className="@container/main flex flex-1 flex-col gap-2">
+                    <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+                        <div className="flex px-4 lg:px-6">
+                            <Select defaultValue={''} onValueChange={(s) => setLevel(s)}>
+                                <SelectTrigger size="sm">
+                                    <SelectValue placeholder="User Level" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {userLevel.map((item) => {
+                                        return <SelectItem value={item}>{item}</SelectItem>
+                                    })}
+                                </SelectContent>
+                            </Select>
+                            <Input type="text" placeholder="Name" className="w-40 ml-2 h-8 text-sm" onChange={(e) => setName(e.target.value)} />
+                            <Button variant="outline" className="ml-2" size="sm" onClick={get}>
+                                <Search />
+                                <span className="hidden lg:inline">Query</span>
+                            </Button>
+                            <Button variant="outline" className="ml-2" size="sm" onClick={handleDeletes}>
+                                <Trash2 />
+                                <span className="hidden lg:inline">Delete</span>
+                            </Button>
+                            <Button variant="outline" className="ml-2" size="sm" onClick={downloadExcel}>
+                                <ArrowDownToLine />
+                                <span className="hidden lg:inline">Export Excel</span>
+                            </Button>
+                        </div>
+                        <DataTable<User> ref={tableRef} columns={columns} datas={list} />
+                        <DataPagination totalRow={totalRow} pageIndex={pageIndex} pageSize={pageSize} toPage={toPage} changePageSize={changePageSize} />
                     </div>
-                    <DataTable<User> ref={tableRef} columns={columns} datas={list} />
-                    <DataPagination totalRow={totalRow} pageIndex={pageIndex} pageSize={pageSize} toPage={toPage} changePageSize={changePageSize} />
                 </div>
             </div>
-        </div>
+            <DeleteConfirmDialog open={delOpen} onConfirm={() => { del(); }} onClose={() => { setDelOpen(false) }} />
+        </>
     );
 }
