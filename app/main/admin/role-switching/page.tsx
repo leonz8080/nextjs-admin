@@ -6,7 +6,11 @@ import { Button } from "@/components/ui/button"
 import { AuthWrap } from "@/components/common/auth-wrap"
 import { userPermissionsStore } from "@/hooks/use-global-store"
 
+import { useTranslations } from 'next-intl';
+
 export default function RoleSwitch() {
+    const t = useTranslations();
+
     const { permissions, setUserPermissions } = userPermissionsStore();
     const [isSuperAdmin, setSuperAdmin] = useState(false);
 
@@ -33,10 +37,6 @@ export default function RoleSwitch() {
             'userAnalysis',
             'salesAnalysis',
             'table',
-            'images',
-            'fileUpload',
-            'filePreview',
-            'excel',
             'adminRoleSwitching'
         ]);
     }
@@ -45,23 +45,23 @@ export default function RoleSwitch() {
         <div className="mt-10">
             <div className="items-center gap-2 text-center">
                 <h1 className="text-xl font-bold">
-                    Click the button to switch roles.
+                    {t("switch-role-title")}
                 </h1>
                 <div className="mt-2 text-sm font-normal">
-                    Current role {isSuperAdmin ? "Super Administrator" : "Administrator"}
+                    {t("current-role")} {isSuperAdmin ? "Super Administrator" : "Administrator"}
                 </div>
             </div>
             <div className="items-center gap-2 text-center mt-6">
                 <Button variant={isSuperAdmin ? "default" : "outline"} type="button" onClick={switchToSuperAdmin}>
-                    Super Administrator
+                    {t("super-admin")}
                 </Button>
                 <Button variant={isSuperAdmin ? "outline" : "default"} type="button" onClick={switchToAdmin} className="ml-4">
-                    Administrator
+                    {t("administrator")}
                 </Button>
             </div>
             <AuthWrap permission={['admin']}>
                 <div className="items-center text-center mt-6">
-                    Super Administrator Function...
+                    {t("super-admin-tip")}
                 </div>
             </AuthWrap>
         </div>

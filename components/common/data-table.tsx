@@ -37,6 +37,8 @@ import {
 
 import { cn } from "@/lib/client/utils"
 
+import { useTranslations } from 'next-intl';
+
 export type DataTableProps<T> = {
     columns: ColumnDef<T>[];
     datas: T[];
@@ -51,6 +53,8 @@ const DataTableInner = <T,>(
     { columns, datas }: DataTableProps<T>,
     ref: React.Ref<DataTableRef<T>>
 ) => {
+    const t = useTranslations();
+
     const [rowSelection, setRowSelection] = React.useState({})
 
     const table = useReactTable({
@@ -112,7 +116,7 @@ const DataTableInner = <T,>(
                                     colSpan={columns.length}
                                     className="h-24 text-center"
                                 >
-                                    No results.
+                                    {t("no-results")}
                                 </TableCell>
                             </TableRow>
                         )}
@@ -140,6 +144,8 @@ export function DataPagination({
     toPage: (pageIndex: number) => void,
     changePageSize: (pageSize: number) => void,
 }) {
+    const t = useTranslations();
+
     var pageCount = 0
     if (totalRow > 0) {
         pageCount = Math.floor(totalRow / pageSize) + 1
@@ -147,12 +153,12 @@ export function DataPagination({
     return (
         <div className="flex items-center justify-between px-4 lg:px-6">
             <div className="text-muted-foreground hidden flex-1 text-sm lg:flex">
-                Total {totalRow} row(s).
+                {t("total")} {totalRow} {t("rows")}.
             </div>
             <div className="flex w-full items-center gap-8 lg:w-fit">
                 <div className="hidden items-center gap-2 lg:flex">
                     <Label htmlFor="rows-per-page" className="text-sm font-medium">
-                        Rows per page
+                        {t("page-rows")}
                     </Label>
                     <Select
                         value={pageSize.toString()}
@@ -175,7 +181,7 @@ export function DataPagination({
                     </Select>
                 </div>
                 <div className="flex w-fit items-center justify-center text-sm font-medium">
-                    Page {pageIndex} of{" "}
+                    {t("page")} {pageIndex} {t("of")}{" "}
                     {pageCount}
                 </div>
                 <div className="ml-auto flex items-center gap-2 lg:ml-0">
@@ -185,7 +191,7 @@ export function DataPagination({
                         onClick={() => toPage(1)}
                         disabled={pageIndex == 1}
                     >
-                        <span className="sr-only">Go to first page</span>
+                        <span className="sr-only">{t("to-first-page")}</span>
                         <IconChevronsLeft />
                     </Button>
                     <Button
@@ -195,7 +201,7 @@ export function DataPagination({
                         onClick={() => toPage(pageIndex - 1)}
                         disabled={pageIndex == 1}
                     >
-                        <span className="sr-only">Go to previous page</span>
+                        <span className="sr-only">{t("to-previous-page")}</span>
                         <IconChevronLeft />
                     </Button>
                     <Button
@@ -205,7 +211,7 @@ export function DataPagination({
                         onClick={() => toPage(pageIndex + 1)}
                         disabled={pageIndex == pageCount}
                     >
-                        <span className="sr-only">Go to next page</span>
+                        <span className="sr-only">{t("to-next-page")}</span>
                         <IconChevronRight />
                     </Button>
                     <Button
@@ -215,7 +221,7 @@ export function DataPagination({
                         onClick={() => toPage(pageCount)}
                         disabled={pageIndex == pageCount}
                     >
-                        <span className="sr-only">Go to last page</span>
+                        <span className="sr-only">{t("to-last-page")}</span>
                         <IconChevronsRight />
                     </Button>
                 </div>

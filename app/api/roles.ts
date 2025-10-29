@@ -20,7 +20,7 @@ export async function get(input: { [key: string]: any; }) {
         orderBy: { id: 'desc' }
     })
 
-    return { result: 0, message: "successful!", data: { total: total, pageIndex: input.data.pageIndex, list: list } };
+    return { result: 0, message: "successful", data: { total: total, pageIndex: input.data.pageIndex, list: list } };
 }
 
 export async function insert(input: { [key: string]: any; }) {
@@ -30,7 +30,7 @@ export async function insert(input: { [key: string]: any; }) {
         },
     })
     if(count > 0) {
-        return { result: 1, message: "Name already exists" };
+        return { result: 1, message: "name-exists" };
     }
 
     try {
@@ -52,9 +52,9 @@ export async function insert(input: { [key: string]: any; }) {
                 data: rolePermission,
             });
         });
-        return { result: 0, message: "successful!" };
+        return { result: 0, message: "successful" };
     } catch (err) {
-        return { result: 1, message: "fail!" };
+        return { result: 1, message: "fail" };
     }
 }
 
@@ -65,7 +65,7 @@ export async function update(input: { [key: string]: any; }) {
         },
     })
     if(role && role.id !== input.data.id) {
-        return { result: 1, message: "Name already exists" };
+        return { result: 1, message: "name-exists" };
     }
 
     var rolePermission: { roleId: number, permission: string }[] = [];
@@ -92,9 +92,9 @@ export async function update(input: { [key: string]: any; }) {
                 data: { name: input.data.name },
             });
         });
-        return { result: 0, message: "successful!" };
+        return { result: 0, message: "successful" };
     } catch (err) {
-        return { result: 1, message: "fail!" };
+        return { result: 1, message: "fail" };
     }
 }
 
@@ -119,9 +119,9 @@ export async function del(input: { [key: string]: any; }) {
                 },
             })
         });
-        return { result: 0, message: "successful!" };
+        return { result: 0, message: "successful" };
     } catch (err) {
-        return { result: 1, message: "fail!" };
+        return { result: 1, message: "fail" };
     }
 }
 
@@ -136,12 +136,12 @@ export async function getRolePermission(input: { [key: string]: any; }) {
     rolePermission.forEach((v) => {
         permissions.push(v.permission)
     })
-    return { result: 0, message: "successful!", data: { permissions: permissions } };
+    return { result: 0, message: "successful", data: { permissions: permissions } };
 }
 
 export async function getAll(input: { [key: string]: any; }) {
     const list = await prisma.roles.findMany({
         where: {}
     })
-    return { result: 0, message: "successful!", data: { list: list } };
+    return { result: 0, message: "successful", data: { list: list } };
 }

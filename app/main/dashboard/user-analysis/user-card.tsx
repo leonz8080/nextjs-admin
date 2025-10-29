@@ -21,7 +21,7 @@ export interface CardDataModel {
 
 export function UserCard({ data }: { data: CardDataModel }) {
     const t = useTranslations();
-
+    
     return (
         <Card className="@container/card">
             <CardHeader>
@@ -38,7 +38,7 @@ export function UserCard({ data }: { data: CardDataModel }) {
             </CardHeader>
             <CardFooter className="flex-col items-start gap-1.5 text-sm">
                 <div className="line-clamp-1 flex gap-2 font-medium">
-                    {data.margin < 0 ? 'Down ' + (data.margin * -1) : 'Up ' + data.margin}% this {data.unit} {data.margin < 0 ? <IconTrendingDown className="size-4" /> : <IconTrendingUp className="size-4" />}
+                    {data.margin < 0 ? t("down") + ' ' + (data.margin * -1) : t("up") + ' ' + data.margin}% {t("this")} {data.unit} {data.margin < 0 ? <IconTrendingDown className="size-4" /> : <IconTrendingUp className="size-4" />}
                 </div>
                 {/*<div className="text-muted-foreground">
                     Acquisition needs attention

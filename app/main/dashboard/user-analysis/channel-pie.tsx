@@ -1,9 +1,13 @@
 "use client"
 
+import { useMemo } from 'react';
+
 import * as echarts from 'echarts';
 import ReactECharts from 'echarts-for-react';
 
 type EChartsOption = echarts.EChartsOption;
+
+import { useTranslations, useLocale } from 'next-intl';
 
 export interface PieDataModel {
     name: string,
@@ -11,15 +15,24 @@ export interface PieDataModel {
 }
 
 export function ChannelPie({ data }: { data: PieDataModel[] }) {
+    const t = useTranslations();
+    const locale = useLocale();
+
+    const translatedData = useMemo(() => (
+        data.map(item => ({
+            ...item,
+            name: t(item.name)
+        }))
+    ), [data, t, locale]);
 
     var option: EChartsOption;
     option = {
         title: {
-            text: 'User Source',
+            text: t("user-source"),
             left: 'left',
             padding: [30, 0, 0, 40],
             textStyle: {
-                fontSize: 16, 
+                fontSize: 16,
                 fontWeight: 'bold',
             }
         },
@@ -34,7 +47,7 @@ export function ChannelPie({ data }: { data: PieDataModel[] }) {
         },
         series: [
             {
-                name: 'Access From',
+                name: t("access-from"),
                 type: 'pie',
                 center: ['65%', '50%'],
                 radius: ['0%', '80%'],
@@ -53,7 +66,7 @@ export function ChannelPie({ data }: { data: PieDataModel[] }) {
                 labelLine: {
                     show: false
                 },
-                data: data
+                data: translatedData
             }
         ]
     };

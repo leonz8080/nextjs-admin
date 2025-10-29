@@ -5,8 +5,10 @@ import bcrypt from "bcrypt";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 import { generateToken } from "@/lib/server/jwt";
+import { authenticator } from 'otplib';
+import QRCode from 'qrcode';
 
-import { getConfig } from "../../lib/server/global-cache";
+import { getConfig, adminCache } from "../../lib/server/global-cache";
 
 export async function login(input: { [key: string]: any; }) {
     const admin = await prisma.admin.findFirst({
@@ -16,7 +18,7 @@ export async function login(input: { [key: string]: any; }) {
     })
 
     if (!admin) {
-        return { result: 1, message: "Invalid username or password." };
+        return { result: 1, message: "error-username-password" };
     }
     //const hashedPassword = await bcrypt.hash('123456', 10);
     //console.log(hashedPassword)
@@ -32,14 +34,25 @@ export async function login(input: { [key: string]: any; }) {
             data: { jti: tokenData.jti, tokenHash: tokenData.tokenHash },
         });
         if (admin.name == 'admin') {
-            res = NextResponse.json({ result: 0, message: "Login successful!", data: { name: admin.name, avatar: admin.avatar, permissions: ['admin'] } });
+            adminCache.set(admin.id, {
+                jti: tokenData.jti,
+                tokenHash: tokenData.tokenHash,
+                permissions: ['admin']
+            })
+            res = NextResponse.json({ result: 0, message: "successful", data: { name: admin.name, avatar: admin.avatar, permissions: ['admin'] } });
         } else {
             const result = await prisma.$queryRaw<{ permission: string }[]>`SELECT distinct b.permission FROM AdminRole a, RolePermission b WHERE a.adminId = ${admin.id} and a.roleId = b.roleId`;
             let permissions: string[] = [];
             result.forEach((v) => {
                 permissions.push(v.permission);
             });
-            res = NextResponse.json({ result: 0, message: "Login successful!", data: { name: admin.name, avatar: admin.avatar, permissions: permissions } });
+            
+            adminCache.set(admin.id, {
+                jti: tokenData.jti,
+                tokenHash: tokenData.tokenHash,
+                permissions: permissions
+            })
+            res = NextResponse.json({ result: 0, message: "successful", data: { name: admin.name, avatar: admin.avatar, permissions: permissions } });
         }
         res.cookies.set("token", tokenData.token, {
             httpOnly: true,
@@ -48,7 +61,7 @@ export async function login(input: { [key: string]: any; }) {
             path: "/",
         });
     } else {
-        res = { result: 1, message: "Invalid username or password." };
+        res = { result: 1, message: "error-username-password" };
     }
     return res;
 }
@@ -59,7 +72,7 @@ export async function logout(input: { [key: string]: any; }) {
         data: { jti: "", tokenHash: "" },
     });
     return NextResponse.json(
-        { result: 0, message: "Logout successful!" },
+        { result: 0, message: "successful" },
         {
             status: 200,
             headers: {
@@ -70,7 +83,7 @@ export async function logout(input: { [key: string]: any; }) {
 }
 
 export async function checkToken(input: { [key: string]: any; }) {
-    return { result: 0, message: "successful!" }
+    return { result: 0, message: "successful" }
 }
 
 export async function updatePassword(input: { [key: string]: any; }) {
@@ -81,12 +94,12 @@ export async function updatePassword(input: { [key: string]: any; }) {
     })
 
     if (!admin) {
-        return { result: 1, message: "Fail." };
+        return { result: 1, message: "fail" };
     }
 
     const isMatch = await bcrypt.compare(input.data.password, admin.password);
     if (!isMatch) {
-        return { result: 1, message: "Incorrect password" };
+        return { result: 1, message: "incorrect-password" };
     }
 
     const password = await bcrypt.hash(input.data.password1, 10);
@@ -95,7 +108,7 @@ export async function updatePassword(input: { [key: string]: any; }) {
         data: { password: password },
     });
 
-    return { result: 0, message: "Successful!" };
+    return { result: 0, message: "successful" };
 }
 
 export async function getAdmin(input: { [key: string]: any; }) {
@@ -106,12 +119,12 @@ export async function getAdmin(input: { [key: string]: any; }) {
     })
 
     if (!admin) {
-        return { result: 1, message: "User does not exist." };
+        return { result: 1, message: "user-not-exist" };
     }
 
     return {
         result: 0,
-        message: "successful!",
+        message: "successful",
         data: {
             name: admin.name,
             avatar: admin.avatar,
@@ -143,5 +156,92 @@ export async function updateAdminBySelf(input: { [key: string]: any; }) {
             address: input.data.address,
         },
     });
-    return { result: 0, message: "successful!", data: { avatar: avatar } };
+    return { result: 0, message: "successful", data: { avatar: avatar } };
+}
+
+export async function getGoogleAuthQr(input: { [key: string]: any; }) {
+    const admin = await prisma.admin.findFirst({
+        where: {
+            id: input.adminId,
+        },
+    })
+
+    if (!admin) {
+        return { result: 1, message: "user-not-exist" };
+    }
+
+    if (admin.isBindGoogle === 1) {
+        return { result: 0, message: "successful", data: { binded: 1, url: '' } };
+    }
+
+    var secret = '';
+    if (admin.googleSecret) {
+        secret = admin.googleSecret
+    } else {
+        secret = authenticator.generateSecret();
+
+        await prisma.admin.update({
+            where: { id: input.adminId },
+            data: {
+                googleSecret: secret
+            },
+        });
+    }
+
+    const otpauth = authenticator.keyuri(input.adminId, '/leonz8080/nextjs-admin', secret);
+    const qrCodeDataURL = await QRCode.toDataURL(otpauth);
+
+    return { result: 0, message: "successful", data: { binded: 0, url: qrCodeDataURL } };
+}
+
+export async function resetGoogleAuthQr(input: { [key: string]: any; }) {
+    const secret = authenticator.generateSecret();
+
+    const otpauth = authenticator.keyuri(input.adminId, '/leonz8080/nextjs-admin', secret);
+    const qrCodeDataURL = await QRCode.toDataURL(otpauth);
+
+    await prisma.admin.update({
+        where: { id: input.adminId },
+        data: {
+            isBindGoogle: 0,
+            googleSecret: secret
+        },
+    });
+
+    return { result: 0, message: "successful", data: { binded: 0, url: qrCodeDataURL } };
+}
+
+export async function verifyGoogleAuth(input: { [key: string]: any; }) {
+    const admin = await prisma.admin.findFirst({
+        where: {
+            id: input.adminId,
+        },
+    })
+
+    if (!admin) {
+        return { result: 1, message: "user-not-exist" };
+    }
+
+    if (!admin.googleSecret) {
+        return { result: 1, message: "google-no-bound" };
+    }
+
+    const isValid = authenticator.check(input.data.code, admin.googleSecret);
+
+    if (isValid) {
+        return { result: 0, message: "successful" };
+    }
+    return { result: 1, message: "fail" };
+}
+
+export async function cancelGoogleAuth(input: { [key: string]: any; }) {
+    await prisma.admin.update({
+        where: { id: input.adminId },
+        data: {
+            isBindGoogle: 0,
+            googleSecret: ''
+        },
+    });
+
+    return { result: 0, message: "successful" };
 }

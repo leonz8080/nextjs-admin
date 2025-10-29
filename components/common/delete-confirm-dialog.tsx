@@ -9,6 +9,8 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
+import { useTranslations } from 'next-intl';
+
 interface DeleteConfirmProps {
     open: boolean;
     onClose: () => void;
@@ -16,13 +18,15 @@ interface DeleteConfirmProps {
 }
 
 export function DeleteConfirmDialog({ open, onConfirm, onClose }: DeleteConfirmProps) {
+    const t = useTranslations();
+
     return (
         <Dialog open={open} onOpenChange={onClose}>
             <DialogContent className="sm:max-w-[400px]">
                 <DialogHeader>
-                    <DialogTitle>确认删除</DialogTitle>
+                    <DialogTitle>{t("confirm-del")}</DialogTitle>
                     <DialogDescription>
-                        此操作无法撤销，确认删除吗？
+                        {t("confirm-del-tip")}
                     </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>
@@ -30,14 +34,14 @@ export function DeleteConfirmDialog({ open, onConfirm, onClose }: DeleteConfirmP
                         variant="outline"
                         onClick={() => {
                             onClose();
-                        }}>取消</Button>
+                        }}>{t("cancel")}</Button>
                     <Button
                         variant="destructive"
                         onClick={() => {
                             onConfirm();
                         }}
                     >
-                        确认删除
+                        {t("confirm-del")}
                     </Button>
                 </DialogFooter>
             </DialogContent>

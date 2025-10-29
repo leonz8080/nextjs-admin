@@ -3,12 +3,9 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { ComponentType } from "react";
-import {
-    type LucideIcon,
-} from "lucide-react";
 
 import * as routes from "@/config/pages"
-import { languages } from '@/constants/language';
+import { LanguageKey } from '@/constants/language';
 
 export const urlListStore = {
     urlList: new Map<string, string[]>(),
@@ -200,8 +197,6 @@ export const userPermissionsStore = create<UserPermissions>()(
         }
     )
 );
-
-export type LanguageKey = keyof typeof languages;
 
 interface LanguageState {
     language: LanguageKey;

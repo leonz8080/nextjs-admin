@@ -5,12 +5,15 @@ import ReactECharts from 'echarts-for-react';
 
 type EChartsOption = echarts.EChartsOption;
 
+import { useTranslations } from 'next-intl';
+
 export function SalesGauge() {
+    const t = useTranslations();
 
     var option: EChartsOption;
     option = {
         title: {
-            text: 'Annual sales completion rate',
+            text: t("annual-sales-rate"),
             left: 'center',
             padding: [225, 0, 0, 0],
             textStyle: {

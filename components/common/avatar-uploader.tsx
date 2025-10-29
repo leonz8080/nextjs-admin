@@ -6,6 +6,8 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner"
 import { upload } from "@/lib/client/utils"
 
+import { useTranslations } from 'next-intl';
+
 export default function AvatarUploader({
     value,
     onChange,
@@ -13,6 +15,8 @@ export default function AvatarUploader({
     value?: string;
     onChange?: (url: string) => void;
 }) {
+    const t = useTranslations();
+
     const inputRef = useRef<HTMLInputElement>(null);
     const [loading, setLoading] = useState(false);
 
@@ -32,11 +36,11 @@ export default function AvatarUploader({
                 return;
             }
         } catch (err) {
-            console.error("上传失败", err);
+            toast.error(t("fail"));
         } finally {
             setLoading(false);
         }
-        toast.error('Fail');
+        toast.error(t("fail"));
     };
 
     return (

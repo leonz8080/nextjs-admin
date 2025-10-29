@@ -23,11 +23,15 @@ import { NavModel } from "@/config/pages"
 
 import { NavA } from "@/components/common/nav-wrap";
 
+import { useTranslations } from 'next-intl';
+
 export function SidebarGroupExt({ group }: { group: NavModel }) {
+    const t = useTranslations();
+
     let i = 0;
     return (
         <SidebarGroup>
-            {group.title ? <SidebarGroupLabel>{group.title}</SidebarGroupLabel> : null}
+            {group.title ? <SidebarGroupLabel>{t(group.title)}</SidebarGroupLabel> : null}
             <SidebarMenu>
                 {
                     group.items && group.items.map((item) => {
@@ -47,6 +51,7 @@ export function Menu({
 }: {
     item: NavModel
 }) {
+    const t = useTranslations();
     const { navMap } = navMapStore();
     return (
         <SidebarMenuItem>
@@ -56,7 +61,7 @@ export function Menu({
             >
                 <NavA navKey={item.url}>
                     {item.icon && <item.icon />}
-                    <span>{item.title}</span>
+                    <span>{t(item.title)}</span>
                 </NavA>
             </SidebarMenuButton>
         </SidebarMenuItem>
@@ -69,6 +74,7 @@ export function MenuCollapsible({
 }: {
     item: NavModel
 }) {
+    const t = useTranslations();
     const { navMap } = navMapStore();
     return (
         <Collapsible
@@ -78,9 +84,9 @@ export function MenuCollapsible({
         >
             <SidebarMenuItem>
                 <CollapsibleTrigger asChild>
-                    <SidebarMenuButton tooltip={item.title}>
+                    <SidebarMenuButton tooltip={t(item.title)}>
                         {item.icon && <item.icon />}
-                        {<span>{item.title}</span>}
+                        {<span>{t(item.title)}</span>}
                         <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                     </SidebarMenuButton>
                 </CollapsibleTrigger>
@@ -90,18 +96,18 @@ export function MenuCollapsible({
                             item.items?.map((subItem) => {
                                 if (!subItem.items)
                                     return (
-                                        <SidebarMenuSubItem key={subItem.title}>
+                                        <SidebarMenuSubItem key={subItem.url}>
                                             <SidebarMenuSubButton asChild>
                                                 <NavA navKey={subItem.url}>
                                                     {subItem.icon && <subItem.icon />}
-                                                    <span>{subItem.title}</span>
+                                                    <span>{t(subItem.title)}</span>
                                                 </NavA>
                                             </SidebarMenuSubButton>
                                         </SidebarMenuSubItem>
                                     )
                                 else
                                     return (
-                                        <MenuCollapsible key={subItem.title} item={item} />
+                                        <MenuCollapsible key={subItem.url} item={item} />
                                     )
                             })
                         }

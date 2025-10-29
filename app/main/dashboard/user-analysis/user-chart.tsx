@@ -6,6 +6,8 @@ import ReactECharts from 'echarts-for-react';
 
 type EChartsOption = echarts.EChartsOption;
 
+import { useTranslations } from 'next-intl';
+
 export interface ChartDataModel {
     month: string,
     news: number,
@@ -14,6 +16,8 @@ export interface ChartDataModel {
 }
 
 export function UserChart({ data }: { data: ChartDataModel[] }) {
+    const t = useTranslations();
+
     var month: string[] = [];
     var news: number[] = [];
     var retains: number[] = [];
@@ -53,7 +57,7 @@ export function UserChart({ data }: { data: ChartDataModel[] }) {
             }
         },
         legend: {
-            data: ['New Users', 'Retain Users', 'Returning Rate']
+            data: [t("new-users"), t("retain-users"), t("returning-rate")]
         },
         xAxis: [
             {
@@ -67,14 +71,14 @@ export function UserChart({ data }: { data: ChartDataModel[] }) {
         yAxis: [
             {
                 type: 'value',
-                name: 'New Users',
+                name: t("new-users"),
                 axisLabel: {
                     formatter: '{value} qty'
                 }
             },
             {
                 type: 'value',
-                name: 'Returning Rate',
+                name: t("returning-rate"),
                 axisLabel: {
                     formatter: '{value} %'
                 }
@@ -82,7 +86,7 @@ export function UserChart({ data }: { data: ChartDataModel[] }) {
         ],
         series: [
             {
-                name: 'New Users',
+                name: t("new-users"),
                 type: 'bar',
                 tooltip: {
                     valueFormatter: function (value) {
@@ -92,7 +96,7 @@ export function UserChart({ data }: { data: ChartDataModel[] }) {
                 data: news
             },
             {
-                name: 'Retain Users',
+                name: t("retain-users"),
                 type: 'bar',
                 tooltip: {
                     valueFormatter: function (value) {
@@ -102,7 +106,7 @@ export function UserChart({ data }: { data: ChartDataModel[] }) {
                 data: retains
             },
             {
-                name: 'Returning Rate',
+                name: t("returning-rate"),
                 type: 'line',
                 yAxisIndex: 1,
                 tooltip: {

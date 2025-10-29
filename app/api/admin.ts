@@ -29,7 +29,7 @@ export async function get(input: { [key: string]: any; }) {
         orderBy: { id: 'desc' }
     })
 
-    return { result: 0, message: "successful!", data: { total: total, pageIndex: input.data.pageIndex, list: list } };
+    return { result: 0, message: "successful", data: { total: total, pageIndex: input.data.pageIndex, list: list } };
 }
 
 export async function insert(input: { [key: string]: any; }) {
@@ -39,7 +39,7 @@ export async function insert(input: { [key: string]: any; }) {
         },
     })
     if (count > 0) {
-        return { result: 1, message: "Name already exists" };
+        return { result: 1, message: "name-exists" };
     }
 
     const password = await bcrypt.hash(input.data.password, 10);
@@ -67,15 +67,15 @@ export async function insert(input: { [key: string]: any; }) {
                 data: adminRole,
             });
         });
-        return { result: 0, message: "successful!" };
+        return { result: 0, message: "successful" };
     } catch (err) {
-        return { result: 1, message: "fail!" };
+        return { result: 1, message: "fail" };
     }
 }
 
 export async function update(input: { [key: string]: any; }) {
     if (input.data.id == 1) {
-        return { result: 1, message: "fail!" };
+        return { result: 1, message: "fail" };
     }
 
     const admin = await prisma.admin.findFirst({
@@ -84,7 +84,7 @@ export async function update(input: { [key: string]: any; }) {
         },
     })
     if (admin && admin.id !== input.data.id) {
-        return { result: 1, message: "Name already exists" };
+        return { result: 1, message: "name-exists" };
     }
 
     var adminRole: { adminId: number, roleId: number }[] = [];
@@ -132,15 +132,15 @@ export async function update(input: { [key: string]: any; }) {
                 });
             }
         });
-        return { result: 0, message: "successful!" };
+        return { result: 0, message: "successful" };
     } catch (err) {
-        return { result: 1, message: "fail!" };
+        return { result: 1, message: "fail" };
     }
 }
 
 export async function del(input: { [key: string]: any; }) {
     if (input.data.id == 1) {
-        return { result: 1, message: "fail!" };
+        return { result: 1, message: "fail" };
     }
     try {
         await prisma.$transaction(async (tx) => {
@@ -156,9 +156,9 @@ export async function del(input: { [key: string]: any; }) {
                 },
             })
         });
-        return { result: 0, message: "successful!" };
+        return { result: 0, message: "successful" };
     } catch (err) {
-        return { result: 1, message: "fail!" };
+        return { result: 1, message: "fail" };
     }
 }
 
@@ -172,5 +172,5 @@ export async function getAdminRole(input: { [key: string]: any; }) {
     list.forEach((v) => {
         roles.push(v.roleId)
     })
-    return { result: 0, message: "successful!", data: { roles: roles } };
+    return { result: 0, message: "successful", data: { roles: roles } };
 }

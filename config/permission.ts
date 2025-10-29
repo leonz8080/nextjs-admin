@@ -1,57 +1,41 @@
 "use client"
 
 interface PermissionModel {
-    key: string,
+    id: string,
     name: string
 }
 
 export const Permission: PermissionModel[] = [
     {
-        key: 'admin',
-        name: 'Super Administrator'
+        id: 'admin',
+        name: 'super-admin'
     },
     {
-        key: 'userAnalysis',
-        name: 'User Analysis'
+        id: 'userAnalysis',
+        name: 'user-analysis'
     },
     {
-        key: 'salesAnalysis',
-        name: 'Sales Analysis'
+        id: 'salesAnalysis',
+        name: 'sales-analysis'
     },
     {
-        key: 'table',
-        name: 'Table'
+        id: 'table',
+        name: 'table'
     },
     {
-        key: 'images',
-        name: 'Images'
+        id: 'adminList',
+        name: 'admin-list'
     },
     {
-        key: 'fileUpload',
-        name: 'File Upload'
+        id: 'adminRoles',
+        name: 'admin-roles'
     },
     {
-        key: 'filePreview',
-        name: 'File Preview'
+        id: 'adminRoleSwitching',
+        name: 'role-switching'
     },
     {
-        key: 'excel',
-        name: 'Excel'
-    },
-    {
-        key: 'adminList',
-        name: 'Admin List'
-    },
-    {
-        key: 'adminRoles',
-        name: 'Admin Roles'
-    },
-    {
-        key: 'adminRoleSwitching',
-        name: 'Admin Role Switching'
-    },
-    {
-        key: 'setting',
-        name: 'Setting'
+        id: 'setting',
+        name: 'setting'
     }
 ]

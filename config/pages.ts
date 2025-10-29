@@ -29,22 +29,22 @@ export const firstPageUrl = "/dashboard/user-analysis";
 
 export const sidebarMenu: NavModel[] = [
     {
-        title: 'Components',
-        url: 'components',
+        title: 'examples',
+        url: 'examples',
         items: [
             {
-                title: 'Dashboard',
+                title: 'dashboard',
                 url: '/dashboard',
                 icon: Gauge,
                 items: [
                     {
-                        title: 'User Analysis',
+                        title: 'user-analysis',
                         url: '/dashboard/user-analysis',
                         component: dynamic(() => import('@/app/main/dashboard/user-analysis/page')),
                         permissions: ['admin', 'userAnalysis'],
                     },
                     {
-                        title: 'Sales Analysis',
+                        title: 'sales-analysis',
                         url: '/dashboard/sales-analysis',
                         component: dynamic(() => import('@/app/main/dashboard/sales-analysis/page')),
                         permissions: ['admin', 'salesAnalysis'],
@@ -52,69 +52,37 @@ export const sidebarMenu: NavModel[] = [
                 ]
             },
             {
-                title: 'Table',
+                title: 'table',
                 url: '/users',
                 icon: Table,
                 component: dynamic(() => import('@/app/main/users/page')),
                 permissions: ['admin', 'table']
             },
-            {
-                title: 'Images',
-                url: '/images',
-                icon: Image,
-                component: dynamic(() => import('@/app/main/images/page')),
-                permissions: ['admin', 'images']
-            },
-            {
-                title: 'File',
-                url: '/file',
-                icon: File,
-                items: [
-                    {
-                        title: 'Upload',
-                        url: '/file/upload',
-                        component: dynamic(() => import('@/app/main/file/upload/page')),
-                        permissions: ['admin', 'fileUpload']
-                    },
-                    {
-                        title: 'Preview',
-                        url: '/file/preview',
-                        component: dynamic(() => import('@/app/main/file/preview/page')),
-                        permissions: ['admin', 'filePreview']
-                    },
-                    {
-                        title: 'Excel',
-                        url: '/file/excel',
-                        component: dynamic(() => import('@/app/main/file/excel/page')),
-                        permissions: ['admin', 'excel']
-                    }
-                ]
-            }
         ]
     },
     {
-        title: 'Pages',
+        title: 'pages',
         url: 'pages',
         items: [
             {
-                title: 'Administrator',
+                title: 'administrator',
                 url: 'administrator',
                 icon: UserRoundCog,
                 items: [
                     {
-                        title: 'List',
+                        title: 'list',
                         url: '/admin/list',
                         component: dynamic(() => import('@/app/main/admin/list/page')),
                         permissions: ['admin', 'adminList']
                     },
                     {
-                        title: 'Roles',
+                        title: 'roles',
                         url: '/admin/roles',
                         component: dynamic(() => import('@/app/main/admin/roles/page')),
                         permissions: ['admin', 'adminRoles']
                     },
                     {
-                        title: 'Role Switching',
+                        title: 'role-switching',
                         url: '/admin/role-switching',
                         component: dynamic(() => import('@/app/main/admin/role-switching/page')),
                         permissions: ['admin', 'adminRoleSwitching']
@@ -122,14 +90,14 @@ export const sidebarMenu: NavModel[] = [
                 ]
             },
             {
-                title: 'Setting',
+                title: 'setting',
                 url: '/setting',
                 icon: Settings,
                 component: dynamic(() => import('@/app/main/setting/page')),
                 permissions: ['admin', 'setting']
             },
             {
-                title: 'Error Page',
+                title: 'error-page',
                 url: 'errorPage',
                 icon: Bug,
                 items: [
@@ -152,14 +120,14 @@ export const sidebarMenu: NavModel[] = [
 ];
 
 export const notice: NavModel = {
-    title: 'Notice',
+    title: 'notice',
     icon: Bell,
     url: '/notice',
-    component: dynamic(() => import('@/app/main/admin/profile/page')),
+    component: dynamic(() => import('@/app/main/notices/page')),
 }
 
 export const profile: NavModel = {
-    title: 'Profile',
+    title: 'profile',
     icon: UserRoundPen,
     url: '/profile',
     component: dynamic(() => import('@/app/main/admin/profile/page')),

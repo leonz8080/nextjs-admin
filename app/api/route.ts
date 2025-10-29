@@ -23,7 +23,7 @@ async function jsonRequest(req: Request) {
 
     const route = routes.get(input.url);
     if (!route) {
-        return NextResponse.json({ result: 1, message: "Invalid API route." });
+        return NextResponse.json({ result: 1, message: "invalid-API" });
     }
 
     if (input.url !== "login" && input.url !== "getDefaultLanguage") {
@@ -34,13 +34,13 @@ async function jsonRequest(req: Request) {
             ?.split("=")[1];
 
         if (!token) {
-            return NextResponse.json({ result: 2, message: "Not authenticated." });
+            return NextResponse.json({ result: 2, message: "not-auth" });
         }
 
         const decoded = verifyToken(token);
         if (!decoded) {
             return NextResponse.json(
-                { result: 2, message: "Token error." },
+                { result: 2, message: "token-error" },
                 {
                     status: 200,
                     headers: {
@@ -52,10 +52,11 @@ async function jsonRequest(req: Request) {
 
         const tokenHash = hashToken(token);
         const admin = await getAdmin(decoded.adminId);
-
+        console.log(admin, decoded.jti, tokenHash)
         if (!admin || admin.jti !== decoded.jti || admin.tokenHash !== tokenHash) {
+            console.log('test')
             return NextResponse.json(
-                { result: 2, message: "Token error." },
+                { result: 2, message: "token-error" },
                 {
                     status: 200,
                     headers: {
@@ -67,8 +68,11 @@ async function jsonRequest(req: Request) {
 
         if (decoded.adminId !== 1) {
             if (route.permissions && !route.permissions?.some(item => admin.permissions.includes(item))) {
-                return NextResponse.json({ result: 403, message: "No permission for this request." });
+                return NextResponse.json({ result: 403, message: "request-permission" });
             }
+            input.permissions = admin.permissions;
+        } else {
+            input.permissions = ["admin"];
         }
 
         input.adminId = decoded.adminId;
@@ -85,7 +89,7 @@ async function jsonRequest(req: Request) {
 
     const mod = await route.ts();
     if (!mod || !(route.fun in mod)) {
-        return NextResponse.json({ result: 1, message: "API function not found." });
+        return NextResponse.json({ result: 1, message: "API-not-found" });
     }
     routeCache[input.url] = mod[route.fun];
     const res = await (mod as any)[route.fun](input);
@@ -101,7 +105,7 @@ async function formDataRequest(req: Request) {
 
     const route = routes.get(formData.get("url") as string);
     if (!route) {
-        return NextResponse.json({ result: 1, message: "Invalid API route." });
+        return NextResponse.json({ result: 1, message: "invalid-API" });
     }
 
     const cookieHeader = req.headers.get("cookie") || "";
@@ -111,13 +115,13 @@ async function formDataRequest(req: Request) {
         ?.split("=")[1];
 
     if (!token) {
-        return NextResponse.json({ result: 2, message: "Not authenticated." });
+        return NextResponse.json({ result: 2, message: "not-auth" });
     }
 
     const decoded = verifyToken(token);
     if (!decoded) {
         return NextResponse.json(
-            { result: 2, message: "Token error." },
+            { result: 2, message: "token-error" },
             {
                 status: 200,
                 headers: {
@@ -132,7 +136,7 @@ async function formDataRequest(req: Request) {
 
     if (!admin || admin.jti !== decoded.jti || admin.tokenHash !== tokenHash) {
         return NextResponse.json(
-            { result: 2, message: "Token error." },
+            { result: 2, message: "token-error" },
             {
                 status: 200,
                 headers: {
@@ -144,8 +148,11 @@ async function formDataRequest(req: Request) {
 
     if (decoded.adminId !== 1) {
         if (route.permissions && !route.permissions?.some(item => admin.permissions.includes(item))) {
-            return NextResponse.json({ result: 403, message: "No permission for this request." });
+            return NextResponse.json({ result: 403, message: "request-permission" });
         }
+        formData.append('permissions', JSON.stringify(admin.permissions));
+    } else {
+        formData.append('permissions', JSON.stringify(["admin"]));
     }
 
     formData.append('adminId', String(decoded.adminId));
@@ -161,7 +168,7 @@ async function formDataRequest(req: Request) {
 
     const mod = await route.ts();
     if (!mod || !(route.fun in mod)) {
-        return NextResponse.json({ result: 1, message: "API function not found." });
+        return NextResponse.json({ result: 1, message: "API-not-found" });
     }
     routeCache[String(formData.get("url"))] = mod[route.fun];
     const res = await (mod as any)[route.fun](formData);

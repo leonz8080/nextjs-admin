@@ -20,7 +20,9 @@ import { NavA } from "@/components/common/nav-wrap"
 import { request } from "@/lib/client/utils"
 import { useNoticeStore } from "@/hooks/use-global-store";
 
-interface Notice {
+import { useTranslations } from 'next-intl';
+
+interface Notices {
     id: number;
     avatar: string;
     title: string;
@@ -28,8 +30,10 @@ interface Notice {
 }
 
 export function Notice() {
+    const t = useTranslations();
+
     const { hasNews, setHasNews } = useNoticeStore();
-    const [notices, setNotices] = useState<Notice[]>([]);
+    const [notices, setNotices] = useState<Notices[]>([]);
     const [open, setOpen] = useState(false);
 
     async function get() {
@@ -39,8 +43,8 @@ export function Notice() {
             return
         }
 
-        for(var i = 0; i < res.data.list.length; i++) {
-            if(res.data.list[i].content.length > 20) {
+        for (var i = 0; i < res.data.list.length; i++) {
+            if (res.data.list[i].content.length > 20) {
                 res.data.list[i].content = res.data.list[i].content.substring(0, 20) + '...'
             }
         }
@@ -62,24 +66,24 @@ export function Notice() {
                 return res.data.list;
             }
 
-            for(var i = 0; i < res.data.list.length; i++) {
-                if(res.data.list[i].status == 0) {
+            for (var i = 0; i < res.data.list.length; i++) {
+                if (res.data.list[i].status == 0) {
                     setHasNews(true);
                     break;
                 }
             }
 
-            return prev; 
+            return prev;
         });
     }
 
     useEffect(() => {
         get();
-        const interval = setInterval(() => {
+        /*const interval = setInterval(() => {
             get()
         }, 10000);
 
-        return () => clearInterval(interval);
+        return () => clearInterval(interval);*/
     }, []);
 
     return (
@@ -126,8 +130,8 @@ export function Notice() {
                     </div>
                     <div className="space-y-1">
                         <Button className="w-full text-xs">
-                            <NavA navKey="/notice">
-                                View All Notification
+                            <NavA navKey="/notice" className="w-full">
+                                {t("view-all-notification")}
                             </NavA>
                         </Button>
                     </div>

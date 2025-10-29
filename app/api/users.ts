@@ -25,20 +25,41 @@ export async function get(input: { [key: string]: any; }) {
         orderBy: { id: 'desc' }
     })
 
-    return { result: 0, message: "successful!", data: { total: total, pageIndex: input.data.pageIndex, list: list } };
+    return { result: 0, message: "successful", data: { total: total, pageIndex: input.data.pageIndex, list: list } };
 }
 
 export async function insert(input: { [key: string]: any; }) {
+    const count = await prisma.users.count({
+        where: {
+            name: input.data.name,
+        },
+    })
+    if (count > 0) {
+        return { result: 1, message: "name-exists" };
+    }
+
     const res = await prisma.users.create({
         data: input.data,
     });
     if (res) {
-        return { result: 0, message: "fail!" };
+        return { result: 0, message: "successful" };
     }
-    return { result: 0, message: "successful!" };
+    return { result: 1, message: "Fail!" };
 }
 
 export async function update(input: { [key: string]: any; }) {
+    if(input.data.column === "name") {
+        const count = await prisma.users.count({
+            where: {
+                name: input.data.value,
+                NOT: { id: input.data.id },
+            },
+        })
+        if (count > 0) {
+            return { result: 1, message: "name-exists" };
+        }
+    }
+    
     const res = await prisma.users.update({
         where: { id: input.data.id },
         data: {
@@ -46,9 +67,9 @@ export async function update(input: { [key: string]: any; }) {
         },
     });
     if (!res) {
-        return { result: 0, message: "fail!" };
+        return { result: 0, message: "fail" };
     }
-    return { result: 0, message: "successful!" };
+    return { result: 0, message: "successful" };
 }
 
 export async function del(input: { [key: string]: any; }) {
@@ -58,9 +79,9 @@ export async function del(input: { [key: string]: any; }) {
         },
     })
     if (!res) {
-        return { result: 0, message: "fail!" };
+        return { result: 0, message: "fail" };
     }
-    return { result: 0, message: "successful!" };
+    return { result: 0, message: "successful" };
 }
 
 export async function exp(input: { [key: string]: any; }) {
@@ -96,13 +117,10 @@ export async function exp(input: { [key: string]: any; }) {
             remark: v.remark,
             status: v.status,
         });
-        // Excel 行号从 1 开始，跳过表头
         const rowIndex = row.number;
 
-        // 图片文件路径（假设在 public 目录中）
         const imagePath = path.join(process.cwd(), "public", v.avatar);
         if (fs.existsSync(imagePath)) {
-            //const imageBuffer = fs.readFileSync(imagePath);
             var ext = path.extname(imagePath).slice(1)
             if (ext === "jpg") ext = "jpeg"; 
             if (ext === 'png' || ext === 'jpeg' || ext === 'gif') {
@@ -111,13 +129,11 @@ export async function exp(input: { [key: string]: any; }) {
                     extension: ext,
                 });
 
-                // 在第 rowIndex 行第 3 列插入图片
                 sheet.addImage(imageId, {
-                    tl: { col: 0, row: rowIndex - 1 }, // 图片左上角坐标（列从 0 开始）
-                    ext: { width: 50, height: 50 }, // 图片大小
+                    tl: { col: 0, row: rowIndex - 1 }, 
+                    ext: { width: 50, height: 50 },
                 });
 
-                // 调整行高
                 sheet.getRow(rowIndex).height = 80;
             }
         }

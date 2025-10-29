@@ -1,10 +1,11 @@
 "use client"
 
 import * as echarts from 'echarts';
-import { useEffect, useRef } from "react";
 import ReactECharts from 'echarts-for-react';
 
 type EChartsOption = echarts.EChartsOption;
+
+import { useTranslations } from 'next-intl';
 
 export interface ChartDataModel {
     month: string,
@@ -13,6 +14,8 @@ export interface ChartDataModel {
 }
 
 export function SalesChart({ data }: { data: ChartDataModel[] }) {
+    const t = useTranslations();
+
     var month: string[] = [];
     var sales: any[] = [];
     var vipSales: any[] = [];
@@ -28,13 +31,13 @@ export function SalesChart({ data }: { data: ChartDataModel[] }) {
         vipSales
     ];
     const series: echarts.SeriesOption[] = [
-        'Ordinary Customers',
-        'VIP Customers'
+        t("customers"),
+        t("VIP-customers")
     ].map((name, sid) => {
         return {
             name,
             type: 'bar',
-            stack: 'total', 
+            stack: 'total',
             barWidth: '50%',
             data: rawData[sid].map((d, did) => {
                 if (sid == 1)
@@ -55,7 +58,7 @@ export function SalesChart({ data }: { data: ChartDataModel[] }) {
 
     option = {
         title: {
-            text: 'Monthly sales',
+            text: t("monthly-sales"),
             left: 'center',
             padding: [20, 0, 0, 0],
             textStyle: {

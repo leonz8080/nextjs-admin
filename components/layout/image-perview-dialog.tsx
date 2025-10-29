@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect } from "react";
-import Image from "next/image";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { useEffect, useRef, useState } from "react";
+import Image, { StaticImageData } from "next/image";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { off } from "process";
 
 interface ImagePreviewDialogProps {
-    images: string[];
+    images: StaticImageData[];
     currentIndex: number;
     open: boolean;
     onClose: () => void;
@@ -30,7 +31,6 @@ export default function ImagePreviewDialog({
         onChangeIndex?.(newIndex);
     };
 
-    // 键盘左右切换
     useEffect(() => {
         if (!open) return;
         const handleKey = (e: KeyboardEvent) => {
@@ -45,42 +45,45 @@ export default function ImagePreviewDialog({
 
     return (
         <Dialog open={open} onOpenChange={onClose}>
-            <DialogContent className="p-0 bg-transparent border-none shadow-none max-w-5xl relative">
-                {/* 关闭按钮 */}
-                <button
-                    onClick={onClose}
-                    className="absolute top-3 right-3 bg-black/40 text-white p-2 rounded-full hover:bg-black/60 transition"
-                >
-                    <X className="w-5 h-5" />
-                </button>
+            <DialogContent className="p-0 bg-transparent border-none shadow-none max-w-none flex items-center justify-center [&_[data-slot=dialog-close]]:hidden">
+                <DialogTitle className="sr-only">Image Preview</DialogTitle>
+                <div className="flex items-center">
+                    <button
+                        onClick={handlePrev}
+                        className="-translate-y-1/2 bg-black/40 text-white p-3 rounded-full hover:bg-black/60 transition"
+                    >
+                        <ChevronLeft className="w-5 h-5" />
+                    </button>
 
-                {/* 左右切换 */}
-                {images.length > 1 && (
-                    <>
-                        <button
-                            onClick={handlePrev}
-                            className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/40 text-white p-3 rounded-full hover:bg-black/60 transition"
-                        >
-                            <ChevronLeft className="w-5 h-5" />
-                        </button>
-                        <button
-                            onClick={handleNext}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/40 text-white p-3 rounded-full hover:bg-black/60 transition"
-                        >
-                            <ChevronRight className="w-5 h-5" />
-                        </button>
-                    </>
-                )}
+                    <div className="relative w-[90vw] h-[80vh] flex items-center justify-center">
 
-                {/* 图片 */}
-                <div className="relative w-full max-h-[80vh] flex justify-center items-center">
-                    <Image
-                        src={images[currentIndex]}
-                        alt={`preview-${currentIndex}`}
-                        width={1600}
-                        height={900}
-                        className="object-contain max-h-[80vh] select-none"
-                    />
+                        <button
+                            onClick={onClose}
+                            style={{
+                                position: "absolute",
+                                top: -32,
+                                right: -40
+                            }}
+                            className="bg-black/40 text-white p-2 rounded-full z-10"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
+
+                        <Image
+                            src={images[currentIndex]}
+                            alt={`preview-${currentIndex}`}
+                            fill
+                            className="object-contain select-none"
+                            sizes="(max-width: 1200px) 90vw, 1600px"
+                        />
+                    </div>
+
+                    <button
+                        onClick={handleNext}
+                        className="-translate-y-1/2 bg-black/40 text-white p-3 rounded-full hover:bg-black/60 transition"
+                    >
+                        <ChevronRight className="w-5 h-5" />
+                    </button>
                 </div>
             </DialogContent>
         </Dialog>

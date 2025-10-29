@@ -8,7 +8,11 @@ import { X } from "lucide-react"
 
 import { useTabsStore, userPermissionsStore } from "@/hooks/use-global-store";
 
+import { useTranslations } from 'next-intl';
+
 export function AppNavbar() {
+    const t = useTranslations();
+
     const { tabs, activeKey, setActive, removeTab } = useTabsStore();
     const { permissions } = userPermissionsStore();
 
@@ -37,7 +41,7 @@ export function AppNavbar() {
                                     variant="secondary"
                                     className="bg-blue-500 text-white dark:bg-blue-600 rounded-none ml-1"
                                 >
-                                    <span>{tab.title}</span>
+                                    <span>{t(tab.title)}</span>
                                     {tabs.length > 1 && <span className="cursor-pointer" onClick={(e) => { e.stopPropagation(); removeTab(tab.key); }}><X size={12} /></span>}
                                 </Badge>
                             )
@@ -48,7 +52,7 @@ export function AppNavbar() {
                                     variant="outline"
                                     className="rounded-none ml-1"
                                 >
-                                    <span className="cursor-pointer" onClick={() => { setActive(tab.key); }}>{tab.title}</span>
+                                    <span className="cursor-pointer" onClick={() => { setActive(tab.key); }}>{t(tab.title)}</span>
                                     {tabs.length > 1 && <span className="cursor-pointer" onClick={(e) => { e.stopPropagation(); removeTab(tab.key); }}><X size={12} /></span>}
                                 </Badge>
                             )

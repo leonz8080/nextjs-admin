@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useForm } from "react-hook-form";
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 
 import {
     Search,
@@ -17,7 +17,6 @@ import {
 import { toast } from "sonner"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
 import {
     Dialog,
     DialogContent,
@@ -26,16 +25,18 @@ import {
     DialogFooter,
     DialogClose
 } from "@/components/ui/dialog"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form } from "@/components/ui/form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { DataTable, DataPagination, DataTableRef } from "@/components/layout/data-table"
+import { DataTable, DataPagination, DataTableRef } from "@/components/common/data-table"
 import { DeleteConfirmDialog } from "@/components/common/delete-confirm-dialog"
 import { Permission } from "@/config/permission"
 
+import { CheckboxItemsField, TextField, CommandField, TextareaField } from "@/components/common/form-field";
 import { request } from "@/lib/client/utils"
+
+import { useTranslations } from 'next-intl';
 
 interface Role {
     id: number;
@@ -44,6 +45,12 @@ interface Role {
 }
 
 export default function Roles() {
+    const t = useTranslations();
+    const Permissiont = Permission.map((item: { id: string; name: string }) => ({
+        ...item,
+        name: t(item.name)
+    }));
+
     const [totalRow, setTotalRow] = useState(0);
     const [pageIndex, setPageIndex] = useState(1);
     const [pageSize, setPageSize] = useState(10);
@@ -57,13 +64,13 @@ export default function Roles() {
 
     const tableRef = useRef<DataTableRef<Role>>(null);
 
-    const schema = z.object({
+    const schema = useMemo(() => z.object({
         id: z.number(),
-        name: z.string().min(1, "名称必填"),
+        name: z.string().min(1, t("name-is-required")),
         permissions: z.array(z.string()).refine((value) => value.some((item) => item), {
-            message: "You have to select at least one item.",
+            message: t("select-min"),
         }),
-    });
+    }), [t]);
 
     type FormData = z.infer<typeof schema>;
 
@@ -104,21 +111,21 @@ export default function Roles() {
     async function insert() {
         const result = await form.trigger();
         if (!result) {
-            toast.error("Fail.")
+            toast.error(t("form-validation"))
             return
         }
 
         try {
             var res = await request('insertRole', form.getValues());
             if (res.result == 0) {
-                toast.success(res.message)
+                toast.success(t(res.message))
                 setOpen(false)
                 get()
             } else {
-                toast.error(res.message)
+                toast.error(t(res.message))
             }
         } catch (error) {
-            console.error("failed", error);
+            toast.error(t("fail"));
         }
 
     }
@@ -135,21 +142,21 @@ export default function Roles() {
     async function update() {
         const result = await form.trigger();
         if (!result) {
-            toast.error("Fail.")
+            toast.error(t("form-validation"))
             return
         }
 
         try {
             var res = await request('updateRole', form.getValues());
             if (res.result == 0) {
-                toast.success(res.message)
+                toast.success(t(res.message))
                 setOpen(false)
                 get()
             } else {
-                toast.error(res.message)
+                toast.error(t(res.message))
             }
         } catch (error) {
-            console.error("failed", error);
+            toast.error(t("fail"));
         }
     }
 
@@ -158,21 +165,21 @@ export default function Roles() {
         setDelOpen(true);
     }
 
-    async function del() {
+    const del = useCallback(async () => {
         var res = await request('deleteRole', {
             id: delId.current
         });
-        
+
         if (res.result != 0 || !res.data) {
             setDelOpen(false);
-            toast.error(res.message)
+            toast.error(t(res.message))
             return
         }
 
         get();
         setDelOpen(false);
-        toast.success(res.message)
-    }
+        toast.success(t(res.message))
+    }, [get, setDelOpen, toast]);
 
     function toPage(pageIndex: number): void {
         setPageIndex(pageIndex);
@@ -188,7 +195,7 @@ export default function Roles() {
     const columns: ColumnDef<Role>[] = [
         {
             accessorKey: "name",
-            header: "Name",
+            header: t('name'),
             cell: ({ row }) => (
                 <span className="block truncate">{row.original.name}</span>
             ),
@@ -196,16 +203,16 @@ export default function Roles() {
         },
         {
             id: "actions",
-            header: "Actions",
+            header: t('actions'),
             cell: ({ row }) => (
                 <>
                     <Button variant="outline" className="ml-2" size="sm" onClick={() => handleUpdate(row.original)}>
                         <Pencil />
-                        <span className="hidden lg:inline">Update</span>
+                        <span className="hidden lg:inline">{t('update')}</span>
                     </Button>
                     <Button variant="outline" className="ml-2" size="sm" onClick={() => handleDelete(row.original.id)}>
                         <Trash2 />
-                        <span className="hidden lg:inline">Delete</span>
+                        <span className="hidden lg:inline">{t('delete')}</span>
                     </Button>
                 </>
             ),
@@ -222,14 +229,14 @@ export default function Roles() {
                 <div className="@container/main flex flex-1 flex-col gap-2">
                     <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
                         <div className="flex px-4 lg:px-6">
-                            <Input type="text" placeholder="Name" className="w-40 h-8 text-sm" onChange={(e) => setName(e.target.value)} />
+                            <Input type="text" placeholder={t('enter-name')} className="w-40 h-8 text-sm" onChange={(e) => setName(e.target.value)} />
                             <Button variant="outline" className="ml-2" size="sm" onClick={get}>
                                 <Search />
-                                <span className="hidden lg:inline">Query</span>
+                                <span className="hidden lg:inline">{t('query')}</span>
                             </Button>
                             <Button variant="outline" className="ml-2" size="sm" onClick={handleInsert}>
                                 <Plus />
-                                <span className="hidden lg:inline">Add New</span>
+                                <span className="hidden lg:inline">{t('add-new')}</span>
                             </Button>
                         </div>
                         <DataTable<Role> ref={tableRef} columns={columns} datas={list} />
@@ -240,70 +247,27 @@ export default function Roles() {
             <Dialog open={open} onOpenChange={setOpen}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Edit Role</DialogTitle>
+                        <DialogTitle>{t('edit-role')}</DialogTitle>
                     </DialogHeader>
                     <Form {...form}>
                         <div className="grid gap-4">
                             <div className="grid gap-3">
-                                <FormField
-                                    control={form.control}
-                                    name="name"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Name</FormLabel>
-                                            <FormControl>
-                                                <Input type="text" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                                <TextField name="name" label={t('name')} className="w-80" placeholder={t('enter-name')} />
                             </div>
                             <div className="grid gap-3">
-                                <div>
-                                    <FormLabel className="text-sm">Permission List</FormLabel>
-                                </div>
-                                {Permission.map((item) => (
-                                    <FormField
-                                        key={item.key}
-                                        control={form.control}
-                                        name="permissions"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormControl>
-                                                    <div className="flex items-center gap-3">
-                                                        <Checkbox
-                                                            checked={field.value?.includes(item.key)}
-                                                            onCheckedChange={(checked) => {
-                                                                return checked
-                                                                    ? field.onChange([...field.value, item.key])
-                                                                    : field.onChange(
-                                                                        field.value?.filter(
-                                                                            (value) => value !== item.key
-                                                                        )
-                                                                    )
-                                                            }}
-                                                        />
-                                                        <Label>{item.name}</Label>
-                                                    </div>
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                ))}
+                                <CheckboxItemsField label={t("permission-list")} name="permissions" items={Permissiont} />
                             </div>
                         </div>
                     </Form>
                     <DialogFooter>
                         <DialogClose asChild>
-                            <Button variant="outline">Cancel</Button>
+                            <Button variant="outline">{t("cancel")}</Button>
                         </DialogClose>
-                        <Button type="button" onClick={operTyp === 'insert' ? insert : update}>Save</Button>
+                        <Button type="button" onClick={operTyp === 'insert' ? insert : update}>{t("save")}</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
-            <DeleteConfirmDialog open={delOpen} onConfirm={() => {del();}} onClose={() => { setDelOpen(false) }} />
+            <DeleteConfirmDialog open={delOpen} onConfirm={() => { del(); }} onClose={() => { setDelOpen(false) }} />
         </>
     );
 }

@@ -98,7 +98,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 version: res.data.version
             });
         }
-        console.log(sysInfo)
     }
 
     useEffect(() => {

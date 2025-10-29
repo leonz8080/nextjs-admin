@@ -5,17 +5,20 @@ import ReactECharts from 'echarts-for-react';
 
 type EChartsOption = echarts.EChartsOption;
 
+import { useTranslations } from 'next-intl';
+
 export interface PieDataModel {
     name: string,
     value: number
 }
 
 export function MarketPie({data}: {data: PieDataModel[]}) {
+    const t = useTranslations();
 
     var option: EChartsOption;
     option = {
         title: {
-            text: 'Market share',
+            text: t("market-share"),
             left: 'center',
             padding: [225, 0, 0, 0],
             textStyle: {
@@ -34,7 +37,7 @@ export function MarketPie({data}: {data: PieDataModel[]}) {
         },
         series: [
             {
-                name: 'Market share',
+                name: t("market-share"),
                 type: 'pie',
                 radius: ['40%', '65%'],
                 center: ['65%', '50%'],

@@ -5,13 +5,16 @@ import ReactECharts from 'echarts-for-react';
 
 type EChartsOption = echarts.EChartsOption;
 
+import { useTranslations } from 'next-intl';
+
 export function CsatGauge({ data }: { data: number }) {
+    const t = useTranslations();
 
     var option: EChartsOption;
 
     option = {
         title: {
-            text: 'CSAT',
+            text: t("customer-satisfaction"),
             left: 'center',
             padding: [225, 0, 0, 0],
             textStyle: {
@@ -68,11 +71,11 @@ export function CsatGauge({ data }: { data: number }) {
                     rotate: 'tangential',
                     formatter: function (value) {
                         if (value === 0.875) {
-                            return 'Satisfied';
+                            return t("satisfied");
                         } else if (value === 0.5) {
-                            return 'Neutral';
+                            return t("neutral");
                         } else if (value === 0.125) {
-                            return 'Dissatisfied';
+                            return t("dissatisfied");
                         }
                         return '';
                     }

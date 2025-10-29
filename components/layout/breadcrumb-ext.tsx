@@ -13,7 +13,11 @@ import {
 
 import { breadcrumbStateStore } from "@/hooks/use-global-store";
 
+import { useTranslations } from 'next-intl';
+
 export function BreadcrumbExt() {
+    const t = useTranslations();
+
     const treadcrumb = breadcrumbStateStore((state) => state.path);
     let len = treadcrumb.length;
 
@@ -27,12 +31,12 @@ export function BreadcrumbExt() {
                             {index < len - 1 ?
                                 (
                                     <BreadcrumbItem key={index} className="hidden md:block">
-                                        <BreadcrumbLink href="#">{item}</BreadcrumbLink>
+                                        <BreadcrumbLink href="#">{t(item)}</BreadcrumbLink>
                                     </BreadcrumbItem>
                                 ) :
                                 (
                                     <BreadcrumbItem key={index}>
-                                        <BreadcrumbPage>{item}</BreadcrumbPage>
+                                        <BreadcrumbPage>{t(item)}</BreadcrumbPage>
                                     </BreadcrumbItem>
                                 )
                             }

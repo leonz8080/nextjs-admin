@@ -7,15 +7,13 @@ import {
 } from "lucide-react";
 import {
     Card,
-    CardAction,
     CardDescription,
     CardFooter,
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
-import { IconTrendingDown, IconTrendingUp } from "@tabler/icons-react"
-import type { TablerIcon } from "@tabler/icons-react";
 import { useTranslations } from 'next-intl';
+
 
 export interface CardDataModel {
     title: string,
@@ -53,12 +51,12 @@ export function SalesCard({ data }: { data: CardDataModel }) {
                 <div className="line-clamp-1 flex gap-2 font-medium">
                     <IconMtm className={`size-4 ${colorMtm}`} />
                     <span className={colorMtm}>{data.mtm}%</span>
-                    Month-on-month
+                    {t("month-on-month")}
                 </div>
                 <div className="line-clamp-1 flex gap-2 font-medium">
                     <IconYty className={`size-4 ${colorYty}`} />
                     <span className={colorYty}>{data.yty}%</span>
-                    Year-on-year
+                    {t("year-on-year")}
                 </div>
                 {/*<div className="text-muted-foreground">
                     Acquisition needs attention

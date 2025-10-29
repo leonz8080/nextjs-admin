@@ -20,7 +20,7 @@ export async function request(
     url: url,
     data: { ...data }
   }
-
+  console.log(url, data)
   const res = await fetch('/api', {
     method: "POST",
     headers: { "Content-Type": "application/json" },

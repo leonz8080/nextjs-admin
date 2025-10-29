@@ -5,26 +5,30 @@ import { Command, CommandDialog, CommandInput, CommandList, CommandEmpty, Comman
 import { navMapStore } from "@/hooks/use-global-store"
 import { NavCommand } from "@/components/common/nav-wrap";
 
+import { useTranslations } from 'next-intl';
+
 export function AppSearchBar() {
+    const t = useTranslations();
+
     const [open, setOpen] = React.useState(false)
     const { navMap } = navMapStore();
 
     return (
         <Command className="rounded-lg border shadow-md md:min-w-[250px]">
-            <CommandInput placeholder="Type a command or search..." readOnly onClick={() => setOpen(true)} />
+            <CommandInput placeholder={t("command-search")} readOnly onClick={() => setOpen(true)} />
             <CommandDialog open={open} onOpenChange={setOpen}>
-                <CommandInput placeholder="Search..." />
+                <CommandInput placeholder={t("search")} />
                 <CommandList>
-                    <CommandEmpty>No results</CommandEmpty>
-                    <CommandGroup heading="Recommend">
+                    <CommandEmpty>{t("no-results")}</CommandEmpty>
+                    <CommandGroup heading={t("recommend")}>
                         {
                             [...navMap].map(([key, value]) => {
                                 var title = '';
-                                for (const t of value.titles) {
+                                for (const tit of value.titles) {
                                     if (title !== '') {
                                         title += '->';
                                     }
-                                    title += t;
+                                    title += t(tit);
                                 }
                                 return <NavCommand key={key} navKey={key} onClose={() => setOpen(false)}>{title}</NavCommand>
                             })

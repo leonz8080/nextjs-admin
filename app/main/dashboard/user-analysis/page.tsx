@@ -1,5 +1,7 @@
 "use client";
 
+import { useState, useEffect, useRef } from 'react';
+
 import { UserCard, CardDataModel } from "./user-card";
 import { UserChart, ChartDataModel } from "./user-chart";
 import { ChannelPie, PieDataModel } from "./channel-pie";
@@ -8,67 +10,85 @@ import {
   Card,
 } from "@/components/ui/card"
 
+import { request } from "@/lib/client/utils"
+
+import { useLanguageStore } from "@/hooks/use-global-store";
+import { useLocale, useTranslations } from 'next-intl';
+
 export default function UserAnalysis() {
+  const t = useTranslations();
+
+  const [chartData, setChartData] = useState<ChartDataModel[]>([]);
+  const [pieData, setPieData] = useState<PieDataModel[]>([]);
 
   const userTotal: CardDataModel = {
-    title: 'Total Users',
+    title: t("total-users"),
     amount: '26,390',
-    unit: 'month',
+    unit: t("month"),
     margin: 5.6
   }
 
   const newUser: CardDataModel = {
-    title: 'New Users',
+    title: t("new-users"),
     amount: '396',
-    unit: 'month',
+    unit: t("month"),
     margin: -6
   }
 
   const retention: CardDataModel = {
-    title: 'Active Users',
+    title: t("active-users"),
     amount: '1,130',
-    unit: 'day',
+    unit: t("day"),
     margin: 15
   }
 
   const payingUser: CardDataModel = {
-    title: 'Unique Visitors',
+    title: t("unique-visitors"),
     amount: '9,801',
-    unit: 'day',
+    unit: t("day"),
     margin: 8
   }
 
-  const chartData: ChartDataModel[] = [
-    { month: '2024.10', news: 336, retains: 236, returnRate: 77 },
-    { month: '2024.11', news: 312, retains: 189, returnRate: 67 },
-    { month: '2024.12', news: 368, retains: 216, returnRate: 70 },
-    { month: '2025.1', news: 304, retains: 190, returnRate: 74 },
-    { month: '2025.2', news: 250, retains: 166, returnRate: 61 },
-    { month: '2025.3', news: 298, retains: 198, returnRate: 72 },
-    { month: '2025.4', news: 260, retains: 149, returnRate: 74 },
-    { month: '2025.5', news: 347, retains: 201, returnRate: 59 },
-    { month: '2025.6', news: 311, retains: 254, returnRate: 66 },
-    { month: '2025.7', news: 288, retains: 196, returnRate: 67 },
-    { month: '2025.8', news: 265, retains: 192, returnRate: 58 },
-    { month: '2025.9', news: 274, retains: 174, returnRate: 65 },
-    { month: '2025.10', news: 248, retains: 159, returnRate: 62 },
-  ]
-
-  const pieData: PieDataModel[] = [
-    { name: 'Search Engine', value: 1063 },
-    { name: 'Social Media', value: 759 },
-    { name: 'Offline Channels', value: 475 },
-    { name: 'Content Community', value: 839 },
-    { name: 'Own Channels', value: 550 },
-    { name: 'Advertising', value: 1236 },
-  ]
-
   const funnelData: FunnelDataModel[] = [
-    { name: 'Visit', value: 2867 },
-    { name: 'Sign-up', value: 1298 },
-    { name: 'Conversion', value: 305 },
-    { name: 'Repeat Purchase', value: 197 },
+    { name: t("visit"), value: 2867 },
+    { name: t("sign-up"), value: 1298 },
+    { name: t("conversion"), value: 305 },
+    { name: t("repeat-purchase"), value: 197 },
   ]
+
+  async function get() {
+    var res = await request('easyQuery', {
+      querys: [
+        {
+          name: 'getMonthUserAddUp',
+          params: {
+            start: '2024.08',
+          }
+        },
+        {
+          name: 'getChannelAddUp',
+          params: {
+            month: '2025.10',
+          }
+        },
+      ]
+    });
+
+    if (res.result != 0 || !res.data) {
+      return
+    }
+
+    if (res.data.getMonthUserAddUp.result !== 1) {
+      setChartData(res.data.getMonthUserAddUp.data);
+    }
+    if (res.data.getMonthUserAddUp.result !== 1) {
+      setPieData(res.data.getChannelAddUp.data);
+    }
+  }
+
+  useEffect(() => {
+    get();
+  }, []);
 
   return (
     <div className="flex flex-1 flex-col">

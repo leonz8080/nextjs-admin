@@ -2,14 +2,13 @@
 
 import * as React from "react"
 import { useForm } from "react-hook-form";
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 
 import {
     Search,
     Trash2,
     Plus,
-    Pencil,
-    type LucideIcon,
+    Pencil
 } from "lucide-react";
 import {
     ColumnDef,
@@ -17,7 +16,6 @@ import {
 import { toast } from "sonner"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
 import {
     Dialog,
     DialogContent,
@@ -31,15 +29,17 @@ import {
     AvatarFallback,
     AvatarImage,
 } from "@/components/ui/avatar"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
-import { number, z } from "zod";
+import { Form } from "@/components/ui/form";
+import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { DeleteConfirmDialog } from "@/components/common/delete-confirm-dialog"
-import { DataTable, DataPagination, DataTableRef } from "@/components/layout/data-table"
-import AvatarUploader from "@/components/layout/avatar-uploader";
+import { DataTable, DataPagination, DataTableRef } from "@/components/common/data-table"
+
 import { request } from "@/lib/client/utils"
+import { AvatarField, TextField, PhoneField, CheckboxItemsField } from "@/components/common/form-field";
+
+import { useTranslations } from 'next-intl';
 
 interface Admin {
     id: number;
@@ -58,6 +58,8 @@ interface Role {
 }
 
 export default function AdminList() {
+    const t = useTranslations();
+
     const [totalRow, setTotalRow] = useState(0);
     const [pageIndex, setPageIndex] = useState(1);
     const [pageSize, setPageSize] = useState(10);
@@ -72,12 +74,16 @@ export default function AdminList() {
 
     const tableRef = useRef<DataTableRef<Admin>>(null);
 
-    const schema = z.object({
+    const schema = useMemo(() => z.object({
         id: z.number(),
         avatar: z.string(),
-        name: z.string().min(1, "名称必填"),
+        name: z.string().min(1, t("name-is-required")),
         email: z.string(),
-        tele: z.string(),
+        tele: z.object({
+            iso: z.string(),
+            code: z.string().min(1, { message: t("select-area-code") }),
+            number: z.string().min(5, { message: t("enter-phone-number") })
+        }),
         address: z.string(),
         password: z.string().refine((val) => {
             if (operTyp === "insert" && val.length < 6) {
@@ -85,12 +91,12 @@ export default function AdminList() {
             }
             return true;
         }, {
-            message: "新建用户密码不能小于6位"
+            message: t("password-min-length")
         }),
         roles: z.array(z.number()).refine((value) => value.some((item) => item), {
-            message: "You have to select at least one item.",
+            message: t("select-min"),
         }),
-    });
+    }), [t]);
 
     type FormData = z.infer<typeof schema>;
 
@@ -101,7 +107,11 @@ export default function AdminList() {
             avatar: "",
             name: "",
             email: "",
-            tele: "",
+            tele: {
+                iso: "US",
+                code: "1",
+                number: ""
+            },
             address: "",
             password: "",
             roles: []
@@ -130,7 +140,7 @@ export default function AdminList() {
         form.setValue("avatar", '/unAuth.png');
         form.setValue("name", '');
         form.setValue("email", '');
-        form.setValue("tele", '');
+        form.setValue("tele", { iso: "US", code: "1", number: "" });
         form.setValue("password", '');
         form.setValue("address", '');
         form.setValue("roles", []);
@@ -143,30 +153,48 @@ export default function AdminList() {
     async function insert() {
         const result = await form.trigger();
         if (!result) {
-            toast.error("Fail.")
+            toast.error(t("form-validation"))
             return
         }
 
         try {
-            var res = await request('insertAdmin', form.getValues());
+            var res = await request('insertAdmin', {
+                avatar: form.getValues().avatar,
+                name: form.getValues().name,
+                email: form.getValues().email,
+                tele: form.getValues().tele.iso + " " + form.getValues().tele.code + ' ' + form.getValues().tele.number,
+                address: form.getValues().address,
+                password: form.getValues().password,
+                roles: form.getValues().roles,
+            });
             if (res.result == 0) {
-                toast.success(res.message)
+                toast.success(t(res.message))
                 setOpen(false)
                 get()
             } else {
-                toast.error(res.message)
+                toast.error(t(res.message))
             }
         } catch (error) {
-            console.error("failed", error);
+            toast.error(t("fail"));
         }
-
     }
 
     async function handleUpdate(admin: Admin) {
         form.setValue("id", admin.id);
+        form.setValue("avatar", admin.avatar);
         form.setValue("name", admin.name);
         form.setValue("email", admin.email);
-        form.setValue("tele", admin.tele);
+        if (admin.tele) {
+            const teles = admin.tele.split(' ');
+            if (teles.length > 2) {
+                const num = teles.slice(2).join(' ');
+                form.setValue("tele", { iso: teles[0], code: teles[1], number: num });
+            } else {
+                form.setValue("tele", { iso: "US", code: "1", number: admin.tele });
+            }
+        } else {
+            form.setValue("tele", { iso: "US", code: "1", number: "" });
+        }
         form.setValue("address", admin.address);
         form.setValue("password", '');
         var res = await request('getAllRoles', {});
@@ -180,21 +208,30 @@ export default function AdminList() {
     async function update() {
         const result = await form.trigger();
         if (!result) {
-            toast.error("Fail.")
+            toast.error(t("form-validation"))
             return
         }
 
         try {
-            var res = await request('updateAdmin', form.getValues());
+            var res = await request('updateAdmin', {
+                id: form.getValues().id,
+                avatar: form.getValues().avatar,
+                name: form.getValues().name,
+                email: form.getValues().email,
+                tele: form.getValues().tele.iso + " " + form.getValues().tele.code + ' ' + form.getValues().tele.number,
+                address: form.getValues().address,
+                password: form.getValues().password,
+                roles: form.getValues().roles,
+            });
             if (res.result == 0) {
-                toast.success(res.message)
+                toast.success(t(res.message))
                 setOpen(false)
                 get()
             } else {
-                toast.error(res.message)
+                toast.error(t(res.message))
             }
         } catch (error) {
-            console.error("failed", error);
+            toast.error(t("fail"));
         }
     }
 
@@ -203,37 +240,37 @@ export default function AdminList() {
         setDelOpen(true);
     }
 
-    async function del() {
+    const del = useCallback(async () => {
         var res = await request('deleteAdmin', {
             id: delId.current
         });
 
         if (res.result != 0 || !res.data) {
             setDelOpen(false);
-            toast.error(res.message)
+            toast.error(t(res.message))
             return
         }
 
         get();
         setDelOpen(false);
-        toast.success(res.message)
-    }
+        toast.success(t(res.message))
+    }, [get, setDelOpen, request, toast]);
 
-    function toPage(pageIndex: number): void {
+    const toPage = useCallback(async () => {
         setPageIndex(pageIndex);
         get();
-    }
+    }, [get, setPageIndex]);
 
-    function changePageSize(pageSize: number): void {
+    const changePageSize = useCallback((pageSize: number) => {
         setPageSize(pageSize);
         setPageIndex(1);
         get();
-    }
+    }, [get, setPageIndex, setPageSize]);
 
     const columns: ColumnDef<Admin>[] = [
         {
             accessorKey: "name",
-            header: "Admin",
+            header: t("admin"),
             cell: ({ row }) => (
                 <div className="flex items-center block truncate">
                     <Avatar className="rounded-full">
@@ -249,7 +286,7 @@ export default function AdminList() {
         },
         {
             accessorKey: "email",
-            header: "Email",
+            header: t("email"),
             cell: ({ row }) => (
                 <span>{row.original.email}</span>
             ),
@@ -257,7 +294,7 @@ export default function AdminList() {
         },
         {
             accessorKey: "tele",
-            header: "Tele",
+            header: t("tele"),
             cell: ({ row }) => (
                 <span>{row.original.tele}</span>
             ),
@@ -265,7 +302,7 @@ export default function AdminList() {
         },
         {
             accessorKey: "address",
-            header: "Address",
+            header: t("address"),
             cell: ({ row }) => (
                 <span>{row.original.address}</span>
             ),
@@ -273,18 +310,18 @@ export default function AdminList() {
         },
         {
             id: "actions",
-            header: "Actions",
+            header: t("actions"),
             cell: ({ row }) => {
                 if (row.original.id !== 1) {
                     return (
                         <>
                             <Button variant="outline" className="ml-2" size="sm" onClick={() => handleUpdate(row.original)}>
                                 <Pencil />
-                                <span className="hidden lg:inline">Update</span>
+                                <span className="hidden lg:inline">{t("update")}</span>
                             </Button>
                             <Button variant="outline" className="ml-2" size="sm" onClick={() => handleDelete(row.original.id)}>
                                 <Trash2 />
-                                <span className="hidden lg:inline">Delete</span>
+                                <span className="hidden lg:inline">{t("delete")}</span>
                             </Button>
                         </>
                     )
@@ -304,14 +341,14 @@ export default function AdminList() {
                 <div className="@container/main flex flex-1 flex-col gap-2">
                     <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
                         <div className="flex px-4 lg:px-6">
-                            <Input type="text" placeholder="Name" className="w-40 h-8 text-sm" onChange={(e) => setName(e.target.value)} />
+                            <Input type="text" placeholder={t("name")} className="w-40 h-8 text-sm" onChange={(e) => setName(e.target.value)} />
                             <Button variant="outline" className="ml-2" size="sm" onClick={get}>
                                 <Search />
-                                <span className="hidden lg:inline">Query</span>
+                                <span className="hidden lg:inline">{t("query")}</span>
                             </Button>
                             <Button variant="outline" className="ml-2" size="sm" onClick={handleInsert}>
                                 <Plus />
-                                <span className="hidden lg:inline">Add New</span>
+                                <span className="hidden lg:inline">{t("add-new")}</span>
                             </Button>
                         </div>
                         <DataTable<Admin> ref={tableRef} columns={columns} datas={list} />
@@ -327,142 +364,37 @@ export default function AdminList() {
                     <Form {...form}>
                         <div className="grid gap-4">
                             <div className="grid gap-3">
-                                <FormField
-                                    control={form.control}
-                                    name="avatar"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormControl>
-                                                <AvatarUploader
-                                                    value={field.value}
-                                                    onChange={(url: string) => field.onChange(url)}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                                <AvatarField name="avatar" label={t('avatar')} />
                             </div>
                             <div className="grid gap-3">
-                                <FormField
-                                    control={form.control}
-                                    name="name"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Name</FormLabel>
-                                            <FormControl>
-                                                <Input type="text" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                                <TextField name="name" label={t('name')} placeholder={t('enter-name')} />
                             </div>
                             <div className="grid gap-3">
-                                <FormField
-                                    control={form.control}
-                                    name="email"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Email</FormLabel>
-                                            <FormControl>
-                                                <Input type="email" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                                <TextField name="email" label={t('email')} type="email" placeholder={t('enter-email')} />
                             </div>
                             <div className="grid gap-3">
-                                <FormField
-                                    control={form.control}
-                                    name="tele"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Tele</FormLabel>
-                                            <FormControl>
-                                                <Input type="text" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                                <PhoneField name="tele" label={t('tele')} />
                             </div>
                             <div className="grid gap-3">
-                                <FormField
-                                    control={form.control}
-                                    name="address"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Address</FormLabel>
-                                            <FormControl>
-                                                <Input type="text" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                                <TextField name="address" label={t('address')} placeholder={t('enter-address')} />
                             </div>
                             <div className="grid gap-3">
-                                <FormField
-                                    control={form.control}
-                                    name="password"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Password</FormLabel>
-                                            <FormControl>
-                                                <Input type="password" {...field} placeholder={operTyp === 'update' ? 'No need to modify' : ''} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                                <TextField name="password" label={t('password')} placeholder={operTyp === 'update' ? t('no-modify') : ''} />
                             </div>
                             <div className="grid gap-3">
-                                <div>
-                                    <FormLabel className="text-sm">Role List</FormLabel>
-                                </div>
-                                {roles.map((item) => (
-                                    <FormField
-                                        key={item.id}
-                                        control={form.control}
-                                        name="roles"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormControl>
-                                                    <div className="flex items-center gap-3">
-                                                        <Checkbox
-                                                            checked={field.value?.includes(item.id)}
-                                                            onCheckedChange={(checked) => {
-                                                                return checked
-                                                                    ? field.onChange([...field.value, item.id])
-                                                                    : field.onChange(
-                                                                        field.value?.filter(
-                                                                            (value) => value !== item.id
-                                                                        )
-                                                                    )
-                                                            }}
-                                                        />
-                                                        <Label>{item.name}</Label>
-                                                    </div>
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                ))}
+                                <CheckboxItemsField name="roles" label={t("role-list")} items={roles} />
                             </div>
                         </div>
                     </Form>
                     <DialogFooter>
                         <DialogClose asChild>
-                            <Button variant="outline">Cancel</Button>
+                            <Button variant="outline">{t('cancel')}</Button>
                         </DialogClose>
-                        <Button type="button" onClick={operTyp === 'insert' ? insert : update}>Save</Button>
+                        <Button type="button" onClick={operTyp === 'insert' ? insert : update}>{t('save')}</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
-            <DeleteConfirmDialog open={delOpen} onConfirm={() => {del();}} onClose={() => { setDelOpen(false) }} />
+            <DeleteConfirmDialog open={delOpen} onConfirm={() => { del(); }} onClose={() => { setDelOpen(false) }} />
         </>
     );
 }

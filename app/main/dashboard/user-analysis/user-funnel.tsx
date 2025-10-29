@@ -5,12 +5,16 @@ import ReactECharts from 'echarts-for-react';
 
 type EChartsOption = echarts.EChartsOption;
 
+import { useTranslations } from 'next-intl';
+
 export interface FunnelDataModel {
     name: string,
     value: number
 }
 
 export function UserFunnel({ data }: { data: FunnelDataModel[] }) {
+    const t = useTranslations();
+
     var legends: string[] = [];
     data.forEach(v => {
         legends.push(v.name);
@@ -19,7 +23,7 @@ export function UserFunnel({ data }: { data: FunnelDataModel[] }) {
     var option: EChartsOption;
     option = {
         title: {
-            text: 'User Funnel',
+            text: t("user-funnel"),
             padding: [30, 0, 0, 40],
             textStyle: {
                 fontSize: 16,
@@ -42,7 +46,7 @@ export function UserFunnel({ data }: { data: FunnelDataModel[] }) {
         },
         series: [
             {
-                name: 'Funnel',
+                name: t("funnel"),
                 type: 'funnel',
                 left: '35%',
                 top: 30,

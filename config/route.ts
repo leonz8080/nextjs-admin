@@ -11,9 +11,14 @@ export const routes: Map<string, RouteModel> = new Map([
     ["updatePassword", { ts: () => import("@/app/api/auth"), fun: "updatePassword" }],
     ["getAdmin", { ts: () => import("@/app/api/auth"), fun: "getAdmin" }],
     ["updateAdminBySelf", { ts: () => import("@/app/api/auth"), fun: "updateAdminBySelf" }],
+    ["getGoogleAuthQr", { ts: () => import("@/app/api/auth"), fun: "getGoogleAuthQr" }],
+    ["verifyGoogleAuth", { ts: () => import("@/app/api/auth"), fun: "verifyGoogleAuth" }],
+    ["resetGoogleAuthQr", { ts: () => import("@/app/api/auth"), fun: "resetGoogleAuthQr" }],
+    ["cancelGoogleAuth", { ts: () => import("@/app/api/auth"), fun: "cancelGoogleAuth" }],
 
     ['getUsers', { ts: () => import("@/app/api/users"), fun: "get", permissions: ['admin', 'table'] }],
-    ["updateUsers", { ts: () => import("@/app/api/users"), fun: "update", permissions: ['admin', 'table'] }],
+    ["insertUser", { ts: () => import("@/app/api/users"), fun: "insert", permissions: ['admin', 'table'] }],
+    ["updateUser", { ts: () => import("@/app/api/users"), fun: "update", permissions: ['admin', 'table'] }],
     ["deleteUsers", { ts: () => import("@/app/api/users"), fun: "del", permissions: ['admin', 'table'] }],
     ["exportUsers", { ts: () => import("@/app/api/users"), fun: "exp", permissions: ['admin', 'table'] }],
 
@@ -37,4 +42,6 @@ export const routes: Map<string, RouteModel> = new Map([
     ["getAllConfig", { ts: () => import("@/app/api/common"), fun: "getAllConfig" }],
     ["updateConfig", { ts: () => import("@/app/api/common"), fun: "updateConfig" }],
     ["getDefaultLanguage", { ts: () => import("@/app/api/common"), fun: "getDefaultLanguage" }],
+
+    ["easyQuery", { ts: () => import("@/app/api/easy-query"), fun: "query" }],
 ]);

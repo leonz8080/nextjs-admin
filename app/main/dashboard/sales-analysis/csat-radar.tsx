@@ -5,12 +5,15 @@ import ReactECharts from 'echarts-for-react';
 
 type EChartsOption = echarts.EChartsOption;
 
+import { useTranslations } from 'next-intl';
+
 export function CsatRadar({data} : {data: number[]}) {
+    const t = useTranslations();
 
     var option: EChartsOption;
     option = {
         title: {
-            text: 'CSAT analysis',
+            text: t("customer-satisfaction-analysis"),
             left: 'center',
             padding: [225, 0, 0, 0],
             textStyle: {
@@ -22,11 +25,11 @@ export function CsatRadar({data} : {data: number[]}) {
             radius: '65%',
             center: ['45%', '50%'],
             indicator: [
-                { name: 'Product quality', max: 100 },
-                { name: 'Serve', max: 100 },
-                { name: 'Logistics', max: 100 },
-                { name: 'After-sales', max: 100 },
-                { name: 'Recommend', max: 100 }
+                { name: t("product-quality"), max: 100 },
+                { name: t("serve"), max: 100 },
+                { name: t("logistics"), max: 100 },
+                { name: t("after-sales"), max: 100 },
+                { name: t("recommend"), max: 100 }
             ]
         },
         name: {
@@ -39,12 +42,12 @@ export function CsatRadar({data} : {data: number[]}) {
         },
         series: [
             {
-                name: 'CSAT analysis',
+                name: t("customer-satisfaction-analysis"),
                 type: 'radar',
                 data: [
                     {
-                        value: [90, 75, 73, 66, 85],
-                        name: 'Score'
+                        value: data,
+                        name: t("score")
                     }
                 ]
             }

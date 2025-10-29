@@ -3,10 +3,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import ReactCrop, { Crop, PixelCrop } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
 import { cn } from "@/lib/utils";
+
+import { useTranslations } from 'next-intl';
 
 interface CropDialogProps {
     open: boolean;
@@ -17,6 +19,8 @@ interface CropDialogProps {
 }
 
 export function ImageCropDialog({ open, imageSrc, circularCrop, onClose, onCropDone }: CropDialogProps) {
+    const t = useTranslations();
+
     const [crop, setCrop] = useState<Crop>({ unit: "%", x: 25, y: 25, width: 50, height: 50 });
     const [completedCrop, setCompletedCrop] = useState<PixelCrop | null>(null);
     const [croppedUrl, setCroppedUrl] = useState<string | null>(null);
@@ -28,7 +32,6 @@ export function ImageCropDialog({ open, imageSrc, circularCrop, onClose, onCropD
         imgRef.current = img;
     };
 
-    // 生成预览
     useEffect(() => {
         if (!completedCrop || !imgRef.current || !previewCanvasRef.current) return;
 
@@ -50,7 +53,6 @@ export function ImageCropDialog({ open, imageSrc, circularCrop, onClose, onCropD
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // 圆形裁剪
         if (circularCrop) {
             ctx.beginPath();
             ctx.arc(crop.width / 2, crop.height / 2, crop.width / 2, 0, 2 * Math.PI);
@@ -100,13 +102,13 @@ export function ImageCropDialog({ open, imageSrc, circularCrop, onClose, onCropD
                         </div>
 
                         <div className="text-center">
-                            <p className="text-sm mb-1">预览：</p>
+                            <p className="text-sm mb-1">{t("preview")}</p>
                             <canvas key={circularCrop ? "circle" : "square"} ref={previewCanvasRef} className={cn("border w-32 h-32 object-cover", circularCrop ? "rounded-full" : "rounded-none")} />
                         </div>
 
                         <div className="flex gap-3">
-                            <Button variant="outline" onClick={onClose}>取消</Button>
-                            <Button onClick={handleDone}>确定裁剪</Button>
+                            <Button variant="outline" onClick={onClose}>{t("cancel")}</Button>
+                            <Button onClick={handleDone}>{t("confirm")}</Button>
                         </div>
                     </div>
                 )}

@@ -23,6 +23,8 @@ model Admin {
   address      String?
   jti          String?
   tokenHash    String?
+  googleSecret String?
+  isBindGoogle Int    @default(0)
 }
 
 model Roles {
@@ -67,4 +69,21 @@ model Config {
   id           Int    @id @default(autoincrement())
   name         String @unique
   value        String
+}
+
+model MonthAddUp {
+  id           Int    @id @default(autoincrement())
+  month        String
+  newUser      Int
+  retainUser   Int
+  returnRate   Int
+  sales        Int
+  vipSales     Int
+}
+
+model ChannelAddUp {
+  id           Int    @id @default(autoincrement())
+  month        String
+  channel      String
+  newUser      Int
 }
