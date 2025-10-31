@@ -4,6 +4,7 @@ Nextjs Admin is a full-stack solution for a backend management system, employing
 
 ## 📦 Features
 
+```plaintext
 📂 The front-end interface uses tabbed mode to open and switch. Switching between tabs retains the input state of the previous tab.
 🧱 The system provides server-side example code.
 🏢 For demonstration purposes, SQLite is used as the database. It can be easily switched to other databases such as MySQL.
@@ -13,6 +14,7 @@ Nextjs Admin is a full-stack solution for a backend management system, employing
 
 ## 📒 Directory Structure & Main document description
 
+```plaintext
 ├── app/
 │   ├── api/                 # backend interface（Next.js Route Handlers）
 │   │   └──route.ts          # Backend request distribution and request access control
@@ -42,6 +44,7 @@ Nextjs Admin is a full-stack solution for a backend management system, employing
 └── middleware.ts
 
 ## 🧩 technology stack
+
 - Next.js 15
 - TypeScript
 - Tailwind CSS
