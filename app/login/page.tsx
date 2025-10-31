@@ -128,6 +128,9 @@ export default function Login() {
                                             <Button type="button" className="w-full" onClick={handleSubmit}>
                                                 {t("login")}
                                             </Button>
+                                            <div className="text-center">
+                                                username: admin,    password: 123456 
+                                            </div>
                                         </div>
                                     </div>
                                 </form>

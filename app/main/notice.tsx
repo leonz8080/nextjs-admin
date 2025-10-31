@@ -49,6 +49,8 @@ export function Notice() {
             }
         }
 
+        let shouldHasNews = false;
+
         setNotices(prev => {
             if (!res.data) {
                 return [];
@@ -56,25 +58,29 @@ export function Notice() {
 
             if (res.data.list.length > 0 && prev.length > 0) {
                 if (res.data.list[0].id > prev[0].id) {
-                    setHasNews(true);
+                    shouldHasNews = true;
                     return res.data.list;
                 }
             }
 
             if (prev.length === 0 && res.data.list.length > 0) {
-                setHasNews(true);
+                shouldHasNews = true;
                 return res.data.list;
             }
 
             for (var i = 0; i < res.data.list.length; i++) {
                 if (res.data.list[i].status == 0) {
-                    setHasNews(true);
+                    shouldHasNews = true;
                     break;
                 }
             }
 
             return prev;
         });
+
+        if (shouldHasNews) {
+            setHasNews(true);
+        }
     }
 
     useEffect(() => {

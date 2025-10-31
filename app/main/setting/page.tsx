@@ -52,6 +52,7 @@ export default function Setting() {
             toast.error(t("form-validation"))
             return
         }
+        return;
 
         try {
             var res = await request('updateConfig', form.getValues());

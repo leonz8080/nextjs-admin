@@ -158,6 +158,8 @@ export default function AdminList() {
             return
         }
 
+        return;
+
         try {
             var res = await request('insertAdmin', {
                 avatar: form.getValues().avatar,
@@ -212,6 +214,8 @@ export default function AdminList() {
             toast.error(t("form-validation"))
             return
         }
+        
+        return;
 
         try {
             var res = await request('updateAdmin', {
@@ -242,6 +246,7 @@ export default function AdminList() {
     }
 
     const del = useCallback(async () => {
+        return;
         var res = await request('deleteAdmin', {
             id: delId.current
         });

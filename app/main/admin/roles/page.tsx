@@ -114,6 +114,7 @@ export default function Roles() {
             toast.error(t("form-validation"))
             return
         }
+        return;
 
         try {
             var res = await request('insertRole', form.getValues());
@@ -145,6 +146,7 @@ export default function Roles() {
             toast.error(t("form-validation"))
             return
         }
+        return;
 
         try {
             var res = await request('updateRole', form.getValues());
@@ -166,6 +168,7 @@ export default function Roles() {
     }
 
     const del = useCallback(async () => {
+        return;
         var res = await request('deleteRole', {
             id: delId.current
         });

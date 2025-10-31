@@ -156,6 +156,7 @@ export default function Users() {
             toast.error(t("form-validation"))
             return
         }
+        return;
 
         try {
             var res = await request('insertUser', form.getValues());
@@ -172,6 +173,7 @@ export default function Users() {
     }
 
     const update = useCallback(async (id: number, column: string, value: number | string) => {
+        return;
         var res = await request('updateUser', {
             id: id,
             column: column,
@@ -203,6 +205,7 @@ export default function Users() {
     }
 
     const del = useCallback(async () => {
+        return;
         var res = await request('deleteUsers', {
             id: delIds.current
         });

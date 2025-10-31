@@ -112,6 +112,7 @@ export function AdminMenu() {
             toast.error(t("form-validation"))
             return
         }
+        return;
         try {
             var res = await request('updatePassword', pwdForm.getValues());
             if (res.result == 0) {
@@ -148,6 +149,7 @@ export function AdminMenu() {
             toast.error(t("form-validation"))
             return
         }
+        return;
 
         try {
             var res = await request('verifyGoogleAuth', googleForm.getValues);
@@ -167,6 +169,7 @@ export function AdminMenu() {
     }
 
     async function resetGoogleAuthQr() {
+        return;
         try {
             var res = await request('resetGoogleAuthQr', {});
             if (res.result == 0 && res.data) {
@@ -184,6 +187,7 @@ export function AdminMenu() {
     }
 
     async function cancelGoogleAuth() {
+        return;
         try {
             var res = await request('cancelGoogleAuth', {});
             if (res.result == 0 && res.data) {
