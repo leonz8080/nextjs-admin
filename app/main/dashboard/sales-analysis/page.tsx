@@ -87,30 +87,32 @@ export default function SalesAnalysis() {
 
     return (
         <div className="flex flex-1 flex-col">
-            <div className="@container/main flex flex-1 flex-col gap-2 py-6 px-6">
-                <div className="grid auto-rows-min gap-4 grid-cols-3 ">
-                    <SalesCard data={salesTotal} />
-                    <SalesCard data={orderTotal} />
-                    <SalesCard data={userTotal} />
-                </div>
-                <div className="flex auto-rows-min gap-4 mt-4">
-                    <Card className="@container/card w-66 h-66 py-0 px-0">
-                        <SalesGauge />
-                    </Card>
-                    <Card className="@container/card flex-1 py-0 px-0">
-                        <SalesChart data={salesChart} />
-                    </Card>
-                </div>
-                <div className="flex auto-rows-min gap-4 mt-4">
-                    <Card className="@container/card w-66 h-66 py-0 px-0">
-                        <CsatGauge data={csatGauge} />
-                    </Card>
-                    <Card className="@container/card w-80 h-66 py-0 px-0">
-                        <CsatRadar data={csatRadar} />
-                    </Card>
-                    <Card className="@container/card flex-1 h-66 py-0 px-0">
-                        <MarketPie data={pieData} />
-                    </Card>
+            <div className="@container/main flex flex-1 flex-col gap-2">
+                <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+                    <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-1 @4xl/main:grid-cols-3">
+                        <SalesCard data={salesTotal} />
+                        <SalesCard data={orderTotal} />
+                        <SalesCard data={userTotal} />
+                    </div>
+                    <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-1 @4xl/main:flex">
+                        <Card className="@container/card w-66 h-66 py-0 px-0">
+                            <SalesGauge />
+                        </Card>
+                        <Card className="@container/card flex-1 h-66 py-0 px-0">
+                            <SalesChart data={salesChart} />
+                        </Card>
+                    </div>
+                    <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-1 @4xl/main:flex">
+                        <Card className="@container/card w-66 h-66 py-0 px-0">
+                            <CsatGauge data={csatGauge} />
+                        </Card>
+                        <Card className="@container/card w-80 h-66 py-0 px-0">
+                            <CsatRadar data={csatRadar} />
+                        </Card>
+                        <Card className="@container/card flex-1 h-66 py-0 px-0">
+                            <MarketPie data={pieData} />
+                        </Card>
+                    </div>
                 </div>
             </div>
         </div>

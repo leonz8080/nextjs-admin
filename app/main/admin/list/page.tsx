@@ -86,6 +86,7 @@ export default function AdminList() {
         }),
         address: z.string(),
         password: z.string().refine((val) => {
+            console.log(operTyp)
             if (operTyp === "insert" && val.length < 6) {
                 return false;
             }
@@ -256,16 +257,14 @@ export default function AdminList() {
         toast.success(t(res.message))
     }, [get, setDelOpen, request, toast]);
 
-    const toPage = useCallback(async () => {
+    const toPage = useCallback(async (pageIndex: number) => {
         setPageIndex(pageIndex);
-        get();
-    }, [get, setPageIndex]);
+    }, [setPageIndex]);
 
     const changePageSize = useCallback((pageSize: number) => {
         setPageSize(pageSize);
         setPageIndex(1);
-        get();
-    }, [get, setPageIndex, setPageSize]);
+    }, [setPageIndex, setPageSize]);
 
     const columns: ColumnDef<Admin>[] = [
         {
@@ -296,7 +295,7 @@ export default function AdminList() {
             accessorKey: "tele",
             header: t("tele"),
             cell: ({ row }) => (
-                <span>{row.original.tele}</span>
+                <span>{row.original.tele.split(" ").slice(1).join(' ')}</span>
             ),
             meta: { className: "min-w-[100px] text-left" },
         },
@@ -333,7 +332,7 @@ export default function AdminList() {
 
     useEffect(() => {
         get()
-    }, []);
+    }, [pageIndex, pageSize]);
 
     return (
         <>
@@ -364,7 +363,7 @@ export default function AdminList() {
                     <Form {...form}>
                         <div className="grid gap-4">
                             <div className="grid gap-3">
-                                <AvatarField name="avatar" label={t('avatar')} />
+                                <AvatarField name="avatar" label={t('avatar')} catalog="admin" />
                             </div>
                             <div className="grid gap-3">
                                 <TextField name="name" label={t('name')} placeholder={t('enter-name')} />

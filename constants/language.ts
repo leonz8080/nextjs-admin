@@ -130,7 +130,7 @@ export const languages = {
         "token-expiration-tip": "If it never expires, fill in 0",
         "IP-whitelist": "IP Whitelist",
         "enter-IP-whitelist": "Enter IP whitelist",
-        "IP-whitelist-tip": "One per line. Leave blank to allow all IPs.",
+        "IP-whitelist-tip": "Separate with commas. Leave blank to allow all IPs.",
         "silver": "Silver",
         "gold": "Gold",
         "diamond": "Diamond",
@@ -219,7 +219,8 @@ export const languages = {
         "down": "Down",
         "this": "this",
         "month": "month",
-        "day": "day"
+        "day": "day",
+        "compress-image": "Compressed images"
     },
     zh: {
         "username-is-required": "用户名为必填项",
@@ -341,7 +342,7 @@ export const languages = {
         "token-expiration-tip": "若永不过期，请填写 0",
         "IP-whitelist": "IP 白名单",
         "enter-IP-whitelist": "请输入 IP 白名单",
-        "IP-whitelist-tip": "每行一个。留空表示允许所有 IP。",
+        "IP-whitelist-tip": "逗号分隔。留空表示允许所有 IP。",
         "silver": "白银",
         "gold": "黄金",
         "diamond": "钻石",
@@ -430,7 +431,8 @@ export const languages = {
         "down": "下降",
         "this": "本",
         "month": "月",
-        "day": "日"
+        "day": "日",
+        "compress-image": "压缩图片"
     },
     es: {
         "username-is-required": "El nombre de usuario es obligatorio",
@@ -552,7 +554,7 @@ export const languages = {
         "token-expiration-tip": "Si nunca expira, escribe 0",
         "IP-whitelist": "Lista blanca de IP",
         "enter-IP-whitelist": "Introduce la lista blanca de IP",
-        "IP-whitelist-tip": "Una por línea. Déjalo en blanco para permitir todas las IP.",
+        "IP-whitelist-tip": "Separar con comas. Déjalo en blanco para permitir todas las IP.",
         "silver": "Plata",
         "gold": "Oro",
         "diamond": "Diamante",
@@ -641,7 +643,8 @@ export const languages = {
         "down": "Bajar",
         "this": "este",
         "month": "mes",
-        "day": "día"
+        "day": "día",
+        "compress-image": "Imágenes comprimidas"
     },
     fr: {
         "username-is-required": "Nom d'utilisateur requis",
@@ -763,7 +766,7 @@ export const languages = {
         "token-expiration-tip": "S’il n’expire jamais, indiquez 0",
         "IP-whitelist": "Liste blanche IP",
         "enter-IP-whitelist": "Entrer la liste blanche IP",
-        "IP-whitelist-tip": "Une par ligne. Laissez vide pour autoriser toutes les IP.",
+        "IP-whitelist-tip": "Séparez par des virgules. Laissez vide pour autoriser toutes les IP.",
         "silver": "Argent",
         "gold": "Or",
         "diamond": "Diamant",
@@ -852,7 +855,8 @@ export const languages = {
         "down": "En baisse",
         "this": "ce",
         "month": "mois",
-        "day": "jour"
+        "day": "jour",
+        "compress-image": "Images compressées"
     }
 } as const;
 

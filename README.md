@@ -1,38 +1,77 @@
-🚧 This project is still under development and its functions are not yet complete. Please do not use it in a production environment.
+## Nextjs Admin
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Nextjs Admin is a full-stack solution for a backend management system, employing the SSR (Server-Side Response) architecture. designed to allow developers to quickly develop their own backend management systems based on this template.
 
-## Getting Started
+## 📦 Features
+
+📂 The front-end interface uses tabbed mode to open and switch. Switching between tabs retains the input state of the previous tab.
+🧱 The system provides server-side example code.
+🏢 For demonstration purposes, SQLite is used as the database. It can be easily switched to other databases such as MySQL.
+🎟️ The system has built-in access control functionality. On the front end, access can be controlled down to the page and specific areas within the page. On the server side, access can be controlled up to the request and its contents.
+🌍 It supports multiple languages, and the languages ​​can be switched in real time.
+⚙️ It aims to improve the reusability of components, using components with a consistent style within the same system, allowing developers to modify them according to their own needs.
+
+## 📒 Directory Structure & Main document description
+
+├── app/
+│   ├── api/                 # backend interface（Next.js Route Handlers）
+│   │   └──route.ts          # Backend request distribution and request access control
+│   ├── main/                # Main interface module
+│   ├── login/               # Login page
+│   └── error-page/          # Error pages (403, 404, etc.)
+├── components/              # Reusable components
+│   ├── app/              
+│   ├── common/              # General components
+│   └── ui/                  # shadcn components
+├── config/               
+│   ├── easy-query.ts        # Simple query configuration              
+│   ├── pages.ts             # Front-end page and permission configuration
+│   ├── permission.ts        # Permission Definition
+│   └── route.ts             # Server-side routing and permission configuration
+├── constants/               
+│   ├── country-codes.ts     # International telephone area code list              
+│   ├── language.ts          # Multilingual configuration
+│   └── timezones.ts         # Time zone list
+├── hooks/                   # Custom Hooks
+│   └── use-global-store.ts  # Front State Manager
+├── lib/                     # Utility functions / Common logic
+│   ├── client               # Front-end tools    
+│   └── server               # Server-side tools   
+├── public/                  
+├── .env                   
+└── middleware.ts
+
+## 🧩 technology stack
+- Next.js 15
+- TypeScript
+- Tailwind CSS
+- Shadcn UI
+- next-intl
+- Prisma
+- ECharts
+- Zustand
+- node-cache (For demonstration purposes, this setup is only applicable to a single server and single process. For cluster deployment, it is recommended to use Redis instead.)
+
+## 🚀 Getting Started
 
 First, run the development server:
 
 ```bash
+# Cloning project
+git clone https://github.com/username/repo-name.git
+
+# Enter the directory
+cd repo-name
+
+# Install dependencies
+npm install
+
+# Start the development environment
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+username: admin  password: 123456.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📜 License
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT License

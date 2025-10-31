@@ -5,6 +5,7 @@ import "./globals.css";
 import { useEffect, useMemo } from 'react'
 
 import { NextIntlClientProvider } from 'next-intl';
+import { ThemeProvider as NextThemesProvider } from "next-themes"
 import { Toaster } from "sonner"
 
 import { useLanguageStore } from "@/hooks/use-global-store";
@@ -56,8 +57,10 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <NextIntlClientProvider locale={language} messages={languages[language]}>
-          <Toaster />
-          {children}
+          <NextThemesProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+            <Toaster />
+            {children}
+          </NextThemesProvider>
         </NextIntlClientProvider>
       </body>
     </html>

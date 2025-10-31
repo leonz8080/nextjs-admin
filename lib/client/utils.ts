@@ -1,6 +1,5 @@
 "use client"
 
-import Cookies from "js-cookie"
 import { useRouter } from "next/navigation";
 
 import * as routes from "@/config/pages"
@@ -20,7 +19,6 @@ export async function request(
     url: url,
     data: { ...data }
   }
-  console.log(url, data)
   const res = await fetch('/api', {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -29,6 +27,9 @@ export async function request(
   let re = await res.json();
   if (re.result == 2) {
     window.location.href = "/login";
+  }
+  if (re.result == 403) {
+    window.location.href = "/error-page/p403";
   }
   return re;
 }
@@ -60,11 +61,13 @@ export async function download(
 
 export async function upload(
   url: string,
+  catalog: string,
   file: File
 ) {
   try {
     const form = new FormData();
     form.append("url", url);
+    form.append("catalog", catalog);
     form.append("file", file);
 
     const res = await fetch("/api", {
@@ -75,6 +78,12 @@ export async function upload(
     if (!res.ok) throw new Error("upload error");
 
     const data = await res.json();
+    if (data.result == 2) {
+      window.location.href = "/login";
+    }
+    if (data.result == 403) {
+      window.location.href = "/error-page/p403";
+    }
     return data;
 
   } catch (err) {

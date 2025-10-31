@@ -64,7 +64,7 @@ export default function Notices() {
         setHasNews(false)
     }
 
-    const toPage = useCallback(async () => {
+    const toPage = useCallback(async (pageIndex: number) => {
         setPageIndex(pageIndex);
         get();
     }, [get, setPageIndex]);
@@ -110,7 +110,7 @@ export default function Notices() {
 
     useEffect(() => {
         get()
-    }, []);
+    }, [pageIndex, pageSize]);
 
     return (
         <div className="flex flex-1 flex-col">

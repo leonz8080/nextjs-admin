@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "../../lib/PrismaClient";
 import { routes } from "@/config/route";
-import { getAdmin } from "@/lib/server/global-cache";
+import { getAdmin, getConfig } from "@/lib/server/global-cache";
 import { verifyToken, hashToken } from "@/lib/server/jwt";
 
 var routeCache: { [key: string]: any; } = {};
@@ -24,6 +24,20 @@ async function jsonRequest(req: Request) {
     const route = routes.get(input.url);
     if (!route) {
         return NextResponse.json({ result: 1, message: "invalid-API" });
+    }
+
+    if (input.url !== "getDefaultLanguage") {
+        if (!(await checkIp(req))) {
+            return NextResponse.json(
+                { result: 403, message: "Access Denied" },
+                {
+                    status: 200,
+                    headers: {
+                        "Set-Cookie": "token=; Path=/; HttpOnly; Max-Age=0"
+                    },
+                }
+            );
+        }
     }
 
     if (input.url !== "login" && input.url !== "getDefaultLanguage") {
@@ -52,9 +66,7 @@ async function jsonRequest(req: Request) {
 
         const tokenHash = hashToken(token);
         const admin = await getAdmin(decoded.adminId);
-        console.log(admin, decoded.jti, tokenHash)
         if (!admin || admin.jti !== decoded.jti || admin.tokenHash !== tokenHash) {
-            console.log('test')
             return NextResponse.json(
                 { result: 2, message: "token-error" },
                 {
@@ -106,6 +118,20 @@ async function formDataRequest(req: Request) {
     const route = routes.get(formData.get("url") as string);
     if (!route) {
         return NextResponse.json({ result: 1, message: "invalid-API" });
+    }
+
+    if (formData.get("url") !== "getDefaultLanguage") {
+        if (!(await checkIp(req))) {
+            return NextResponse.json(
+                { result: 403, message: "Access Denied" },
+                {
+                    status: 200,
+                    headers: {
+                        "Set-Cookie": "token=; Path=/; HttpOnly; Max-Age=0"
+                    },
+                }
+            );
+        }
     }
 
     const cookieHeader = req.headers.get("cookie") || "";
@@ -177,4 +203,18 @@ async function formDataRequest(req: Request) {
     } else {
         return NextResponse.json(res);
     }
+}
+
+async function checkIp(req: Request) {
+    const ip =
+        req.headers.get("x-forwarded-for")?.split(",")[0] ||
+        req.headers.get("x-real-ip") ||
+        "Unknown IP";
+
+    var ipWhitelist = (await getConfig("ipWhitelist"));
+    ipWhitelist = ipWhitelist.replace(/\s+/g, '');
+    if (ipWhitelist.length !== 0 && !ipWhitelist.split(",").includes(ip)) {
+        return false
+    }
+    return true
 }

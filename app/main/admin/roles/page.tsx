@@ -181,16 +181,14 @@ export default function Roles() {
         toast.success(t(res.message))
     }, [get, setDelOpen, toast]);
 
-    function toPage(pageIndex: number): void {
+    const toPage = useCallback(async (pageIndex: number) => {
         setPageIndex(pageIndex);
-        get();
-    }
+    }, [setPageIndex]);
 
-    function changePageSize(pageSize: number): void {
+    const changePageSize = useCallback((pageSize: number) => {
         setPageSize(pageSize);
         setPageIndex(1);
-        get();
-    }
+    }, [setPageIndex, setPageSize]);
 
     const columns: ColumnDef<Role>[] = [
         {
@@ -221,7 +219,7 @@ export default function Roles() {
 
     useEffect(() => {
         get()
-    }, []);
+    }, [pageIndex, pageSize]);
 
     return (
         <>

@@ -2,6 +2,8 @@ import { prisma } from "../../lib/PrismaClient";
 import { Prisma } from "@prisma/client";
 import bcrypt from "bcrypt";
 
+import { adminCache } from "@/lib/server/global-cache"
+
 export async function get(input: { [key: string]: any; }) {
     const where: Prisma.AdminWhereInput = {
         ...(input.data.name ? { name: { contains: input.data.name } } : {}),
@@ -132,10 +134,14 @@ export async function update(input: { [key: string]: any; }) {
                 });
             }
         });
-        return { result: 0, message: "successful" };
     } catch (err) {
         return { result: 1, message: "fail" };
     }
+
+    if(adminCache.has(input.data.id)) {
+        adminCache.del(input.data.id)
+    }
+    return { result: 0, message: "successful" };
 }
 
 export async function del(input: { [key: string]: any; }) {
@@ -156,6 +162,8 @@ export async function del(input: { [key: string]: any; }) {
                 },
             })
         });
+
+        adminCache.del(input.data.id)
         return { result: 0, message: "successful" };
     } catch (err) {
         return { result: 1, message: "fail" };

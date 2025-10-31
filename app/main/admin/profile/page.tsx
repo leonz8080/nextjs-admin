@@ -76,6 +76,7 @@ export default function Profile() {
     }
 
     async function updateAdminBySelf() {
+        console.log(form.getValues())
         const result = await form.trigger();
         if (!result) {
             toast.error(t("form-validation"))

@@ -15,6 +15,7 @@ import { useTranslations } from 'next-intl';
 interface DateTimeCellProps {
     id: number;
     value: string;
+    className?: string;
     onUpdate: (id: number, field: string, value: string) => Promise<void>;
 }
 
@@ -25,7 +26,7 @@ function isValidDate(date: Date | undefined) {
     return !isNaN(date.getTime())
 }
 
-export function DataTimeCell({ id, value: initialValue, onUpdate }: DateTimeCellProps) {
+export function DataTimeCell({ id, value: initialValue, className, onUpdate }: DateTimeCellProps) {
     const t = useTranslations();
 
     const [open, setOpen] = React.useState(false);
@@ -38,7 +39,7 @@ export function DataTimeCell({ id, value: initialValue, onUpdate }: DateTimeCell
             <Input
                 id="date"
                 value={value}
-                className="bg-background pr-6 h-8 text-sm w-48"
+                className={cn("bg-background pr-6 h-8 text-sm", className)}
                 onChange={(e) => {
                     const date = new Date(e.target.value);
                     setValue(e.target.value);
@@ -59,7 +60,7 @@ export function DataTimeCell({ id, value: initialValue, onUpdate }: DateTimeCell
                     <Button
                         id="date-picker"
                         variant="ghost"
-                        className="absolute top-1/2 right-6 size-6 -translate-y-1/2"
+                        className="absolute top-1/2 right-2 size-6 -translate-y-1/2"
                     >
                         <CalendarIcon className="size-3.5" />
                         <span className="sr-only">{t("select-date")}</span>

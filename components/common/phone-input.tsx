@@ -45,8 +45,8 @@ export default function PhoneInput({ field, className }: PhoneInputProps) {
                 key={countryCode.iso}
                 value={countryCode.iso}
                 onSelect={() => {
-                    field.value = countryCode;
-                    field.onChange(field.value);
+                    field.onChange({ ...field.value, iso: countryCode.iso, code: countryCode.code });
+                    console.log(field.value)
                     setOpen(false);
                 }}
             >

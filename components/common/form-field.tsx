@@ -189,9 +189,10 @@ interface AvatarFieldProps {
     name: string
     label?: string
     className?: string
+    catalog: string
 }
 
-export function AvatarField({ name, label, className }: AvatarFieldProps) {
+export function AvatarField({ name, label, className, catalog }: AvatarFieldProps) {
     const { control } = useFormContext()
 
     return (
@@ -204,6 +205,7 @@ export function AvatarField({ name, label, className }: AvatarFieldProps) {
                     <FormControl>
                         <AvatarUploader
                             value={field.value}
+                            catalog={catalog}
                             onChange={(url: string) => field.onChange(url)}
                         />
                     </FormControl>

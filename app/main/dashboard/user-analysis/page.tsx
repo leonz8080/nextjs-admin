@@ -12,7 +12,6 @@ import {
 
 import { request } from "@/lib/client/utils"
 
-import { useLanguageStore } from "@/hooks/use-global-store";
 import { useLocale, useTranslations } from 'next-intl';
 
 export default function UserAnalysis() {
@@ -105,11 +104,11 @@ export default function UserAnalysis() {
               <UserChart data={chartData} />
             </Card>
           </div>
-          <div style={{ width: "100%", height: "250px" }} className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-1 @4xl/main:grid-cols-2">
-            <Card className="@container/card w-full h-full py-0 px-0">
+          <div style={{ width: "100%" }} className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-1 @4xl/main:grid-cols-2">
+            <Card style={{ height: "250px" }} className="@container/card w-full h-full py-0 px-0">
               <ChannelPie data={pieData} />
             </Card>
-            <Card className="@container/card w-full h-full py-0 px-0">
+            <Card style={{ height: "250px" }} className="@container/card w-full h-full py-0 px-0">
               <UserFunnel data={funnelData} />
             </Card>
           </div>

@@ -11,5 +11,5 @@ export const formatServerTime = (
 
 export const formatDateTime = (date: Date | string | number, fmt?: string) => {
     const sysTimezone = configCache.get("sysTimezone") || "UTC";
-    return formatServerTime(date, sysTimezone, fmt || "yyyy-MM-dd HH:mm:ss");
+    return formatServerTime(date, String(sysTimezone), fmt || "yyyy-MM-dd HH:mm:ss");
 }

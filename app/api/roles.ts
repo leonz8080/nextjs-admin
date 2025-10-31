@@ -1,6 +1,8 @@
 import { prisma } from "../../lib/PrismaClient";
 import { Prisma } from "@prisma/client";
 
+import { adminCache } from "@/lib/server/global-cache"
+
 export async function get(input: { [key: string]: any; }) {
     const where: Prisma.RolesWhereInput = {
         ...(input.data.name ? { name: { contains: input.data.name } } : {}),
@@ -92,6 +94,8 @@ export async function update(input: { [key: string]: any; }) {
                 data: { name: input.data.name },
             });
         });
+
+        adminCache.flushAll();
         return { result: 0, message: "successful" };
     } catch (err) {
         return { result: 1, message: "fail" };
@@ -119,6 +123,8 @@ export async function del(input: { [key: string]: any; }) {
                 },
             })
         });
+        
+        adminCache.flushAll();
         return { result: 0, message: "successful" };
     } catch (err) {
         return { result: 1, message: "fail" };

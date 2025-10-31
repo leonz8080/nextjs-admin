@@ -9,17 +9,19 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 
-import { AppSidebar } from "@/components/layout/app-sidebar"
-import { AppNavbar } from "@/components/layout/app-navbar"
-import { BreadcrumbExt } from "@/components/layout/breadcrumb-ext"
-import { AppSearchBar } from "@/components/layout/app-searchbar"
+import { AppSidebar } from "@/components/app/app-sidebar"
+import { AppNavbar } from "@/components/app/app-navbar"
+import { BreadcrumbExt } from "@/components/app/breadcrumb-ext"
+import { AppSearchBar } from "@/components/app/app-searchbar"
 
+import { useIsMobile } from "@/hooks/use-mobile"
 import { useTabsStore, navMapStore, breadcrumbStateStore } from "@/hooks/use-global-store"
 import { firstPageUrl } from "@/config/pages"
 
 import { Language } from "./language";
 import { AdminMenu } from "./admin-menu";
 import { Notice } from "./notice";
+import { Theme } from "./theme";
 
 import { useTranslations } from 'next-intl';
 
@@ -66,11 +68,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               orientation="vertical"
               className="mr-2 data-[orientation=vertical]:h-4"
             />
-            <BreadcrumbExt />
+            <div className="hidden lg:block">
+              {useIsMobile() ? null : <BreadcrumbExt />}
+            </div>
           </div>
           <div className="flex items-center gap-2 space-x-3 mr-4">
-            <AppSearchBar />
+            {useIsMobile() ? null : <AppSearchBar />}
             <Notice />
+            <Theme />
             <Language />
             <AdminMenu />
           </div>

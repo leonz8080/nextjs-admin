@@ -7,6 +7,9 @@ import { Separator } from "@/components/ui/separator"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
 
+import {
+    Card,
+} from "@/components/ui/card"
 import { Form } from "@/components/ui/form";
 import { useForm, UseFormReturn } from "react-hook-form";
 
@@ -17,7 +20,7 @@ import { request } from "@/lib/client/utils"
 
 import { languages, languageNames } from "@/constants/language";
 
-import { SelectField, TextField, CommandField, TextareaField } from "@/components/common/form-field";
+import { SelectField, TextField, CommandField, TextareaField, SwitchField } from "@/components/common/form-field";
 import { AvatarCropUploader } from "@/components/common/avatar-crop-uploader";
 
 import { useTranslations } from 'next-intl';
@@ -27,7 +30,6 @@ export default function Setting() {
 
     function getConfig() {
         request("getAllConfig", {}).then((res) => {
-            console.log(res);
             if (res.result === 0 && res.data) {
                 sysForm.setValue("sysName", res.data.sysName || "");
                 sysForm.setValue("sysLogo", res.data.sysLogo || "");
@@ -37,8 +39,9 @@ export default function Setting() {
                 otherForm.setValue("sysLanguage", res.data.sysLanguage || "");
                 otherForm.setValue("sysServerTimeZone", res.data.sysServerTimeZone || "");
                 otherForm.setValue("imageLimit", parseInt(res.data.imageLimit) || 0);
+                otherForm.setValue("compressImage", parseInt(res.data.compressImage) || 0);
             } else {
-                toast.error(res.message);
+                toast.error(t(res.message));
             }
         });
     }
@@ -98,6 +101,7 @@ export default function Setting() {
         sysLanguage: z.string().min(1, { message: t("language-is-required") }),
         sysServerTimeZone: z.string().min(1, { message: t("server-timeZone-is-required") }),
         imageLimit: z.number().min(0, { message: t("image-min-size") }),
+        compressImage: z.number()
     }), [t]);
 
     type OtherData = z.infer<typeof otherSchema>;
@@ -117,7 +121,7 @@ export default function Setting() {
 
     return (
         <div className="flex flex-col p-6 gap-4">
-            <div className="flex flex-col gap-6">
+            <Card className="pl-4">
                 <h2 className="text-xl font-bold">{t("sys-set")}</h2>
                 <Form {...sysForm}>
                     <div className="grid gap-6">
@@ -125,10 +129,10 @@ export default function Setting() {
                             <AvatarCropUploader name="sysLogo" className="rounded-none w-20 h-20" circularCrop={true} />
                         </div>
                         <div className="grid gap-3">
-                            <TextField name="sysName" label={t("name")} className="w-80" placeholder={t("enter-name")} />
+                            <TextField name="sysName" label={t("name")} className="w-75" placeholder={t("enter-name")} />
                         </div>
                         <div className="grid gap-3">
-                            <TextField name="sysVersion" label={t("version")} className="w-80" placeholder={t("enter-version")} />
+                            <TextField name="sysVersion" label={t("version")} className="w-75" placeholder={t("enter-version")} />
                         </div>
                         <div className="flex flex-col gap-3">
                             <Button type="button" className="w-30" onClick={() => updateConfig(sysForm)}>
@@ -137,9 +141,8 @@ export default function Setting() {
                         </div>
                     </div>
                 </Form>
-            </div>
-            <Separator />
-            <div className="flex flex-col gap-6">
+            </Card>
+            <Card className="pl-4">
                 <h2 className="text-xl font-bold">{t("general-settings")}</h2>
                 <Form {...otherForm}>
                     <div className="grid gap-6">
@@ -148,7 +151,7 @@ export default function Setting() {
                                 name="sysLanguage"
                                 label={t("default-language")}
                                 options={languageNames}
-                                className="w-80"
+                                className="w-75"
                                 placeholder={t("select-default-language")}
                                 translate="first"
                             />
@@ -157,7 +160,7 @@ export default function Setting() {
                             <CommandField
                                 name="sysServerTimeZone"
                                 label={t("server-time-zone")}
-                                className="w-80"
+                                className="w-75"
                                 placeholder={t("select-time-zone")}
                             />
                         </div>
@@ -165,8 +168,14 @@ export default function Setting() {
                             <TextField
                                 name="imageLimit"
                                 label={t("images-max-size")}
-                                className="w-80"
+                                className="w-75"
                                 placeholder={t("enter-images-max-size")}
+                            />
+                        </div>
+                        <div className="grid gap-3">
+                            <SwitchField
+                                name="compressImage"
+                                label={t("compress-image")}
                             />
                         </div>
                         <div className="flex flex-col gap-3">
@@ -176,9 +185,8 @@ export default function Setting() {
                         </div>
                     </div>
                 </Form>
-            </div>
-            <Separator />
-            <div className="flex flex-col gap-6">
+            </Card>
+            <Card className="pl-4">
                 <h2 className="text-xl font-bold">{t("security-settings")}</h2>
                 <Form {...safeForm}>
                     <div className="grid gap-6">
@@ -186,7 +194,7 @@ export default function Setting() {
                             <TextField
                                 name="tokenExpiration"
                                 label={t("token-expiration")}
-                                className="w-80"
+                                className="w-75"
                                 placeholder={t("enter-token-expiration")}
                                 tip={t("token-expiration-tip")}
                             />
@@ -195,7 +203,7 @@ export default function Setting() {
                             <TextareaField
                                 name="ipWhitelist"
                                 label={t("IP-whitelist")}
-                                className="w-80"
+                                className="w-75"
                                 placeholder={t("enter-IP-whitelist")}
                                 tip={t("IP-whitelist-tip")}
                             />
@@ -207,7 +215,7 @@ export default function Setting() {
                         </div>
                     </div>
                 </Form>
-            </div>
+            </Card>
         </div>
     )
 

@@ -14,13 +14,13 @@ export async function upload(formData: FormData) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    const fileName = `${Date.now()}-${file.name}`;
-    const dir = path.join(process.cwd(), "public", "uploads", formData.get("adminId") as string);
+    const fileName = `${Date.now()}.${file.name.split('.').pop()?.toLowerCase()}`;
+    const dir = path.join(process.cwd(), "public", "uploads", formData.get("catalog") as string, formData.get("adminId") as string);
     await mkdir(dir, { recursive: true });
     const filePath = path.join(dir, fileName);
     await writeFile(filePath, buffer);
 
-    const url = `/uploads/${formData.get("adminId") as string}/${fileName}`;
+    const url = `/uploads/${formData.get("catalog") as string}/${formData.get("adminId") as string}/${fileName}`;
     return { result: 0, message: "successful", data: { url: url } };
 }
 
@@ -99,6 +99,7 @@ export async function getAllConfig(input: { [key: string]: any; }) {
             sysLogo: await getConfig("sysLogo"),
             sysVersion: await getConfig("sysVersion"),
             sysLanguage: await getConfig("sysLanguage"),
+            compressImage: await getConfig("compressImage"),
         }
     };
 }
@@ -116,7 +117,6 @@ export async function getDefaultLanguage(input: { [key: string]: any; }) {
 export async function updateConfig(input: { [key: string]: any; }) {
     for (const key in input.data) {
         configCache.set(key, input.data[key]);
-        console.log(`Config updated: ${key} = ${input.data[key]}`);
         await prisma.config.update({
             where: { name: key },
             data: { value: String(input.data[key]) }

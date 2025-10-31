@@ -9,9 +9,11 @@ import { upload } from "@/lib/client/utils"
 import { useTranslations } from 'next-intl';
 
 export default function AvatarUploader({
+    catalog,
     value,
     onChange,
 }: {
+    catalog: string;
     value?: string;
     onChange?: (url: string) => void;
 }) {
@@ -29,7 +31,7 @@ export default function AvatarUploader({
         setLoading(true);
 
         try {
-            const res = await upload("upload", file);
+            const res = await upload("upload", catalog, file);
 
             if (res.data.url) {
                 onChange?.(res.data.url);

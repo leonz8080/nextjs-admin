@@ -14,7 +14,7 @@ export function AppSearchBar() {
     const { navMap } = navMapStore();
 
     return (
-        <Command className="rounded-lg border shadow-md md:min-w-[250px]">
+        <Command className="rounded-lg border md:min-w-[250px]">
             <CommandInput placeholder={t("command-search")} readOnly onClick={() => setOpen(true)} />
             <CommandDialog open={open} onOpenChange={setOpen}>
                 <CommandInput placeholder={t("search")} />

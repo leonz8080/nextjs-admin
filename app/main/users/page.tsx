@@ -171,7 +171,7 @@ export default function Users() {
         }
     }
 
-    const update = useCallback( async (id: number, column: string, value: number | string) => {
+    const update = useCallback(async (id: number, column: string, value: number | string) => {
         var res = await request('updateUser', {
             id: id,
             column: column,
@@ -214,18 +214,17 @@ export default function Users() {
         }
         setDelOpen(false);
         toast.success(t(res.message))
+        get()
     }, [get, setDelOpen, toast]);
 
-    const toPage = useCallback(async () => {
+    const toPage = useCallback(async (pageIndex: number) => {
         setPageIndex(pageIndex);
-        get();
-    }, [get, setPageIndex]);
+    }, [setPageIndex]);
 
     const changePageSize = useCallback((pageSize: number) => {
         setPageSize(pageSize);
         setPageIndex(1);
-        get();
-    }, [get, setPageIndex, setPageSize]);
+    }, [setPageIndex, setPageSize]);
 
     function downloadExcel() {
         download('exportUsers', 'user.xlsx', {
@@ -296,10 +295,12 @@ export default function Users() {
                     <DataTimeCell
                         id={row.original.id}
                         value={row.original.expiration}
+                        className="w-36"
                         onUpdate={update}
                     />
                 )
             },
+            meta: { className: "w-40" },
         },
         {
             accessorKey: "isValid",
@@ -351,7 +352,7 @@ export default function Users() {
 
     useEffect(() => {
         get()
-    }, []);
+    }, [pageIndex, pageSize]);
 
     return (
         <>
@@ -400,7 +401,7 @@ export default function Users() {
                     <Form {...form}>
                         <div className="grid gap-4">
                             <div className="grid gap-3">
-                                <AvatarField name="avatar" label={t("avatar")} />
+                                <AvatarField name="avatar" label={t("avatar")} catalog="user" />
                             </div>
                             <div className="grid gap-3">
                                 <TextField name="name" label={t("name")} placeholder={t("enter-name")} />

@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useEffect, useState } from 'react'
-import { SidebarGroupExt } from "@/components/layout/sidebar-ext"
+import { SidebarGroupExt } from "@/components/app/sidebar-ext"
 import {
     Sidebar,
     SidebarContent,
@@ -18,7 +18,6 @@ import {
     AvatarFallback,
     AvatarImage,
 } from "@/components/ui/avatar"
-import Link from "next/link";
 
 import { userPermissionsStore } from "@/hooks/use-global-store"
 import { NavModel, sidebarMenu } from "@/config/pages"
@@ -118,7 +117,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         <SidebarMenuButton size="lg" asChild>
                             <a href="#">
                                 <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                                    <Avatar className="rounded-full">
+                                    <Avatar className="rounded-full bg-black dark:ring-0 dark:focus:ring-0 dark:focus:outline-none">
                                         <AvatarImage src={sysInfo.logo} />
                                         <AvatarFallback>
                                             NA
@@ -142,7 +141,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 }
             </SidebarContent>
             <SidebarFooter>
-                {/*<NavUser user={data.user} />*/}
+                
             </SidebarFooter>
             <SidebarRail />
         </Sidebar>

@@ -138,12 +138,12 @@ export async function getAdmin(input: { [key: string]: any; }) {
 export async function updateAdminBySelf(input: { [key: string]: any; }) {
     var avatar = '';
     if (input.data.avatar.startsWith('data:image/png;base64')) {
-        const fileName = `${input.admin.name}.png`;
-        const dir = path.join(process.cwd(), "public", "uploads", input.admin.name);
+        const fileName = `${Date.now()}.png`;
+        const dir = path.join(process.cwd(), "public", "uploads", "admin");
         await mkdir(dir, { recursive: true });
         const filePath = path.join(dir, fileName);
         saveBase64Image(input.data.avatar, filePath);
-        avatar = `/uploads/${input.admin.name}/${fileName}`;
+        avatar = `/uploads/admin/${fileName}`;
     } else {
         avatar = input.data.avatar
     }
