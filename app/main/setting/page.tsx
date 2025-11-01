@@ -52,7 +52,7 @@ export default function Setting() {
             toast.error(t("form-validation"))
             return
         }
-        //if(process.env.NEXT_PUBLIC_EDITABLE==="false") return;
+        if(process.env.NEXT_PUBLIC_EDITABLE==="false") return;
         try {
             const res = await request('updateConfig', form.getValues());
             if (res.result == 0 && res.data) {

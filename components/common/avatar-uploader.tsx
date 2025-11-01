@@ -27,7 +27,7 @@ export default function AvatarUploader({
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
-        //if(process.env.NEXT_PUBLIC_EDITABLE==="false") return;
+        if(process.env.NEXT_PUBLIC_EDITABLE==="false") return;
         setLoading(true);
 
         try {

@@ -107,7 +107,7 @@ export default function Roles() {
             toast.error(t("form-validation"))
             return
         }
-        //if(process.env.NEXT_PUBLIC_EDITABLE==="false") return;
+        if(process.env.NEXT_PUBLIC_EDITABLE==="false") return;
         try {
             const res = await request('insertRole', form.getValues());
             if (res.result == 0) {
@@ -138,7 +138,7 @@ export default function Roles() {
             toast.error(t("form-validation"))
             return
         }
-        //if(process.env.NEXT_PUBLIC_EDITABLE==="false") return;
+        if(process.env.NEXT_PUBLIC_EDITABLE==="false") return;
         try {
             const res = await request('updateRole', form.getValues());
             if (res.result == 0) {
@@ -159,7 +159,7 @@ export default function Roles() {
     }
 
     const del = useCallback(async () => {
-        //if(process.env.NEXT_PUBLIC_EDITABLE==="false") return;
+        if(process.env.NEXT_PUBLIC_EDITABLE==="false") return;
         const res = await request('deleteRole', {
             id: delId.current
         });
