@@ -20,8 +20,7 @@ export function ChannelPie({ data }: { data: Record<string, string | number>[] }
         }))
     ), [data, t, locale]);
 
-    let option: EChartsOption;
-    option = {
+    const option: EChartsOption = {
         title: {
             text: t("user-source"),
             left: 'left',

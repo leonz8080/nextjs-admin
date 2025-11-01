@@ -4,7 +4,7 @@ import { routes } from "@/config/route";
 import { getAdmin, getConfig } from "@/lib/server/global-cache";
 import { verifyToken, hashToken } from "@/lib/server/jwt";
 
-const routeCache: { [key: string]: Function; } = {};
+const routeCache: Record<string, (...args: any[]) => any> = {};
 
 export async function POST(req: Request) {
     const contentType = req.headers.get("content-type") || "";
@@ -19,7 +19,7 @@ export async function POST(req: Request) {
 }
 
 async function jsonRequest(req: Request) {
-    let input = await req.json();
+    const input = await req.json();
 
     const route = routes.get(input.url);
     if (!route) {
@@ -120,7 +120,7 @@ async function jsonRequest(req: Request) {
 }
 
 async function formDataRequest(req: Request) {
-    var formData = await req.formData();
+    const formData = await req.formData();
 
     const route = routes.get(formData.get("url") as string);
     if (!route) {

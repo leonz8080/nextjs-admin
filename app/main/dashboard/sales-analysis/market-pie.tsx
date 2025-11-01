@@ -15,8 +15,7 @@ export interface PieDataModel {
 export function MarketPie({data}: {data: PieDataModel[]}) {
     const t = useTranslations();
 
-    let option: EChartsOption;
-    option = {
+    const option: EChartsOption = {
         title: {
             text: t("market-share"),
             left: 'center',

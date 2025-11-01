@@ -23,9 +23,7 @@ export function UserChart({ data }: { data: Record<string, string| number>[] }) 
         returnRate.push(Number(v.returnRate));
     });
 
-    let option: EChartsOption;
-
-    option = {
+    const option: EChartsOption = {
         grid: {
             top: 60,
             right: 80,

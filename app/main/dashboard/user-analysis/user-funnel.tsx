@@ -20,8 +20,7 @@ export function UserFunnel({ data }: { data: FunnelDataModel[] }) {
         legends.push(v.name);
     });
 
-    let option: EChartsOption;
-    option = {
+    const option: EChartsOption = {
         title: {
             text: t("user-funnel"),
             padding: [30, 0, 0, 40],

@@ -48,9 +48,7 @@ export function SalesChart({ data }: { data: Record<string, string | number>[] }
         };
     });
 
-    let option: EChartsOption;
-
-    option = {
+    const option: EChartsOption = {
         title: {
             text: t("monthly-sales"),
             left: 'center',

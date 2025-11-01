@@ -10,8 +10,7 @@ import { useTranslations } from 'next-intl';
 export function SalesGauge() {
     const t = useTranslations();
 
-    let option: EChartsOption;
-    option = {
+    const option: EChartsOption = {
         title: {
             text: t("annual-sales-rate"),
             left: 'center',

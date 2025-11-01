@@ -10,8 +10,7 @@ import { useTranslations } from 'next-intl';
 export function CsatRadar({data} : {data: number[]}) {
     const t = useTranslations();
 
-    let option: EChartsOption;
-    option = {
+    const option: EChartsOption = {
         title: {
             text: t("customer-satisfaction-analysis"),
             left: 'center',

@@ -8,7 +8,7 @@ type AnyRow = Record<string, string | number | Date>;
 
 export async function query(input: RequestModel<{ querys: EasyQueryModel[] }>) {
     const qs = input.data.querys
-    let result: { [key: string]: unknown; } = {};
+    const result: { [key: string]: unknown; } = {};
 
     for (const q of qs) {
         const queryModel = querys.get(q.name);
