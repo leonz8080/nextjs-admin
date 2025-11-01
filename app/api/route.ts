@@ -4,7 +4,7 @@ import { routes } from "@/config/route";
 import { getAdmin, getConfig } from "@/lib/server/global-cache";
 import { verifyToken, hashToken } from "@/lib/server/jwt";
 
-const routeCache: Record<string, (...args: any[]) => any> = {};
+const routeCache: Record<string, (...args: unknown[]) => unknown> = {};
 
 export async function POST(req: Request) {
     const contentType = req.headers.get("content-type") || "";
