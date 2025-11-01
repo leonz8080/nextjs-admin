@@ -52,7 +52,6 @@ export default function Roles() {
 
     const [name, setName] = useState("");
     const [open, setOpen] = React.useState(false);
-    const [operTyp, setOperTyp] = useState("insert");
     const [delOpen, setDelOpen] = React.useState(false);
     const delId = React.useRef(0);
 
@@ -98,7 +97,7 @@ export default function Roles() {
         form.setValue("id", 0);
         form.setValue("name", '');
         form.setValue("permissions", []);
-        setOperTyp('insert');
+        form.clearErrors();
         setOpen(true);
     }
 
@@ -108,7 +107,7 @@ export default function Roles() {
             toast.error(t("form-validation"))
             return
         }
-
+        if(process.env.NEXT_PUBLIC_EDITABLE==="true") return;
         try {
             const res = await request('insertRole', form.getValues());
             if (res.result == 0) {
@@ -129,7 +128,7 @@ export default function Roles() {
         form.setValue("name", role.name);
         const res = await request<{ permissions: string[] }>('getRolePermission', { id: role.id });
         form.setValue("permissions", res.data?.permissions || []);
-        setOperTyp('update');
+        form.clearErrors();
         setOpen(true);
     }
 
@@ -139,7 +138,7 @@ export default function Roles() {
             toast.error(t("form-validation"))
             return
         }
-
+        if(process.env.NEXT_PUBLIC_EDITABLE==="true") return;
         try {
             const res = await request('updateRole', form.getValues());
             if (res.result == 0) {
@@ -160,6 +159,7 @@ export default function Roles() {
     }
 
     const del = useCallback(async () => {
+        if(process.env.NEXT_PUBLIC_EDITABLE==="true") return;
         const res = await request('deleteRole', {
             id: delId.current
         });
@@ -255,7 +255,7 @@ export default function Roles() {
                         <DialogClose asChild>
                             <Button variant="outline">{t("cancel")}</Button>
                         </DialogClose>
-                        <Button type="button" onClick={operTyp === 'insert' ? insert : update}>{t("save")}</Button>
+                        <Button type="button" onClick={form.getValues().id === 0 ? insert : update}>{t("save")}</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

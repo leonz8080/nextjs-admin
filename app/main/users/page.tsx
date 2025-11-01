@@ -136,6 +136,7 @@ export default function Users() {
             remark: "",
             status: "offline"
         });
+        form.clearErrors();
         setInsertOpen(true);
     }
 
@@ -145,7 +146,7 @@ export default function Users() {
             toast.error(t("form-validation"))
             return
         }
-
+        if(process.env.NEXT_PUBLIC_EDITABLE==="true") return;
         try {
             const res = await request('insertUser', form.getValues());
             if (res.result == 0) {
@@ -161,6 +162,7 @@ export default function Users() {
     }
 
     const update = useCallback(async (id: number, column: string, value: number | string) => {
+        if(process.env.NEXT_PUBLIC_EDITABLE==="true") return;
         const res = await request('updateUser', {
             id: id,
             column: column,
@@ -192,6 +194,7 @@ export default function Users() {
     }
 
     const del = useCallback(async () => {
+        if(process.env.NEXT_PUBLIC_EDITABLE==="true") return;
         const res = await request('deleteUsers', {
             id: delIds.current
         });

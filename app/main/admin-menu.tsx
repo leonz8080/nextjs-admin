@@ -112,6 +112,7 @@ export function AdminMenu() {
             toast.error(t("form-validation"))
             return
         }
+        if(process.env.NEXT_PUBLIC_EDITABLE==="true") return;
         try {
             const res = await request('updatePassword', pwdForm.getValues());
             if (res.result == 0) {
@@ -148,7 +149,7 @@ export function AdminMenu() {
             toast.error(t("form-validation"))
             return
         }
-
+        if(process.env.NEXT_PUBLIC_EDITABLE==="true") return;
         try {
             const res = await request('verifyGoogleAuth', googleForm.getValues());
             if (res.result == 0 && res.data) {
@@ -167,6 +168,7 @@ export function AdminMenu() {
     }
 
     async function resetGoogleAuthQr() {
+        if(process.env.NEXT_PUBLIC_EDITABLE==="true") return;
         try {
             const res = await request<{ binded: number, url: string }>('resetGoogleAuthQr', {});
             if (res.result == 0 && res.data) {
@@ -184,6 +186,7 @@ export function AdminMenu() {
     }
 
     async function cancelGoogleAuth() {
+        if(process.env.NEXT_PUBLIC_EDITABLE==="true") return;
         try {
             const res = await request('cancelGoogleAuth', {});
             if (res.result == 0 && res.data) {

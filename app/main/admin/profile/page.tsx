@@ -82,6 +82,8 @@ export default function Profile() {
             toast.error(t("form-validation"))
             return
         }
+        if(process.env.NEXT_PUBLIC_EDITABLE==="true") return;
+        
         try {
             const res = await request<{ avatar: string }>('updateAdminBySelf', {
                 avatar: form.getValues().avatar,

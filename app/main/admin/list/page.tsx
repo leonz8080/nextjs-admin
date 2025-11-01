@@ -54,7 +54,6 @@ export default function AdminList() {
     const [name, setName] = useState("");
     const [roles, setRoles] = useState<RoleModel[]>([]);
     const [open, setOpen] = React.useState(false);
-    const [operTyp, setOperTyp] = useState("insert");
     const [delOpen, setDelOpen] = React.useState(false);
     const delId = React.useRef(0);
 
@@ -72,8 +71,7 @@ export default function AdminList() {
         }),
         address: z.string(),
         password: z.string().refine((val) => {
-            console.log(operTyp)
-            if (operTyp === "insert" && val.length < 6) {
+            if (form.getValues().id === 0 && val.length < 6) {
                 return false;
             }
             return true;
@@ -133,7 +131,7 @@ export default function AdminList() {
         form.setValue("roles", []);
         const res = await request<{ list: RoleModel[] }>('getAllRoles', {});
         setRoles(res.data?.list || []);
-        setOperTyp('insert');
+        form.clearErrors();
         setOpen(true);
     }
 
@@ -143,6 +141,8 @@ export default function AdminList() {
             toast.error(t("form-validation"))
             return
         }
+
+        if(process.env.NEXT_PUBLIC_EDITABLE==="true") return;
 
         try {
             const res = await request('insertAdmin', {
@@ -188,8 +188,7 @@ export default function AdminList() {
         setRoles(list.data?.list || []);
         const roles = await request<{ roles: number[] }>('getAdminRole', { id: admin.id });
         form.setValue("roles", roles.data?.roles || []);
-        setOperTyp('update');
-        console.log(operTyp);
+        form.clearErrors();
         setOpen(true);
     }
 
@@ -199,7 +198,7 @@ export default function AdminList() {
             toast.error(t("form-validation"))
             return
         }
-
+        if(process.env.NEXT_PUBLIC_EDITABLE==="true") return;
         try {
             const res = await request('updateAdmin', {
                 id: form.getValues().id,
@@ -229,6 +228,7 @@ export default function AdminList() {
     }
 
     const del = useCallback(async () => {
+        if(process.env.NEXT_PUBLIC_EDITABLE==="true") return;
         const res = await request('deleteAdmin', {
             id: delId.current
         });
@@ -365,7 +365,7 @@ export default function AdminList() {
                                 <TextField name="address" label={t('address')} placeholder={t('enter-address')} />
                             </div>
                             <div className="grid gap-3">
-                                <TextField name="password" label={t('password')} placeholder={operTyp === 'update' ? t('no-modify') : ''} />
+                                <TextField name="password" label={t('password')} placeholder={form.getValues().id !== 0 ? t('no-modify') : ''} />
                             </div>
                             <div className="grid gap-3">
                                 <CheckboxItemsField name="roles" label={t("role-list")} items={roles} />
@@ -376,7 +376,7 @@ export default function AdminList() {
                         <DialogClose asChild>
                             <Button variant="outline">{t('cancel')}</Button>
                         </DialogClose>
-                        <Button type="button" onClick={operTyp === 'insert' ? insert : update}>{t('save')}</Button>
+                        <Button type="button" onClick={form.getValues().id === 0 ? insert : update}>{t('save')}</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
