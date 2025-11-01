@@ -57,19 +57,8 @@ import { DataTimeCell, SelectCell, InputCell } from "@/components/common/table-c
 import { DatePickerField, SelectField, AvatarField, TextField, SwitchField } from "@/components/common/form-field";
 
 import { request, download } from "@/lib/client/utils"
-
+import { UserModel, PageModel } from "@/lib/models"
 import { useTranslations } from 'next-intl';
-
-interface User {
-    id: number;
-    avatar: string;
-    name: string;
-    level: string;
-    expiration: string;
-    isValid: number;
-    remark: string;
-    status: string;
-}
 
 export default function Users() {
     const t = useTranslations();
@@ -79,7 +68,7 @@ export default function Users() {
     const [totalRow, setTotalRow] = useState(0);
     const [pageIndex, setPageIndex] = useState(1);
     const [pageSize, setPageSize] = useState(10);
-    const [list, setList] = useState([]);
+    const [list, setList] = useState<UserModel[]>([]);
 
     const [level, setLevel] = useState("");
     const [name, setName] = useState("");
@@ -87,9 +76,9 @@ export default function Users() {
     const [insertOpen, setInsertOpen] = React.useState(false);
 
     const [delOpen, setDelOpen] = React.useState(false);
-    var delIds = React.useRef<number[]>([]);
+    const delIds = React.useRef<number[]>([]);
 
-    const tableRef = useRef<DataTableRef<User>>(null);
+    const tableRef = useRef<DataTableRef<UserModel>>(null);
 
     const schema = useMemo(() => z.object({
         id: z.number(),
@@ -119,7 +108,7 @@ export default function Users() {
     });
 
     async function get() {
-        var res = await request('getUsers', {
+        const res = await request<PageModel<UserModel>>('getUsers', {
             level: level,
             name: name,
             pageIndex: pageIndex,
@@ -156,10 +145,9 @@ export default function Users() {
             toast.error(t("form-validation"))
             return
         }
-        return;
 
         try {
-            var res = await request('insertUser', form.getValues());
+            const res = await request('insertUser', form.getValues());
             if (res.result == 0) {
                 toast.success(t(res.message))
                 setInsertOpen(false)
@@ -173,8 +161,7 @@ export default function Users() {
     }
 
     const update = useCallback(async (id: number, column: string, value: number | string) => {
-        return;
-        var res = await request('updateUser', {
+        const res = await request('updateUser', {
             id: id,
             column: column,
             value: value
@@ -196,7 +183,7 @@ export default function Users() {
 
     async function handleDeletes() {
         const selected = tableRef.current?.getSelectedRows() || [];
-        var ids: number[] = [];
+        const ids: number[] = [];
         selected.map((v, i) => (
             ids.push(v.id)
         ))
@@ -205,8 +192,7 @@ export default function Users() {
     }
 
     const del = useCallback(async () => {
-        return;
-        var res = await request('deleteUsers', {
+        const res = await request('deleteUsers', {
             id: delIds.current
         });
 
@@ -236,7 +222,7 @@ export default function Users() {
         })
     }
 
-    const columns: ColumnDef<User>[] = [
+    const columns: ColumnDef<UserModel>[] = [
         {
             id: "select",
             header: ({ table }) => (
@@ -369,11 +355,11 @@ export default function Users() {
                                 </SelectTrigger>
                                 <SelectContent>
                                     {userLevel.map((item) => {
-                                        return <SelectItem value={item}>{t(item)}</SelectItem>
+                                        return <SelectItem key={item} value={item}>{t(item)}</SelectItem>
                                     })}
                                 </SelectContent>
                             </Select>
-                            <Input type="text" placeholder={t("enter-name")} className="w-40 ml-2 h-8 text-sm" onChange={(e) => setName(e.target.value)} />
+                            <Input type="text" key="name" placeholder={t("enter-name")} className="w-40 ml-2 h-8 text-sm" onChange={(e) => setName(e.target.value)} />
                             <Button variant="outline" className="ml-2" size="sm" onClick={get}>
                                 <Search />
                                 <span className="hidden lg:inline">{t("query")}</span>
@@ -391,7 +377,7 @@ export default function Users() {
                                 <span className="hidden lg:inline">{t("export-excel")}</span>
                             </Button>
                         </div>
-                        <DataTable<User> ref={tableRef} columns={columns} datas={list} />
+                        <DataTable<UserModel> ref={tableRef} columns={columns} datas={list} />
                         <DataPagination totalRow={totalRow} pageIndex={pageIndex} pageSize={pageSize} toPage={toPage} changePageSize={changePageSize} />
                     </div>
                 </div>

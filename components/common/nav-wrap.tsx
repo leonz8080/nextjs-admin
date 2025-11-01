@@ -31,7 +31,7 @@ export const NavA = forwardRef<HTMLAnchorElement, NavAProps>(
                 if (exists)
                     setActive(nav.url);
                 else {
-                    var Component = nav.component
+                    const Component = nav.component
                     addTab({
                         key: nav.url,
                         title: nav.title,
@@ -48,6 +48,8 @@ export const NavA = forwardRef<HTMLAnchorElement, NavAProps>(
         )
     }
 )
+
+NavA.displayName = "NavA";
 
 interface NavDropdownMenuProps extends React.ComponentPropsWithoutRef<typeof DropdownMenuItem> {
     navKey: string;
@@ -74,7 +76,7 @@ export const NavDropdownMenu = forwardRef<HTMLDivElement, NavDropdownMenuProps>(
                 if (exists)
                     setActive(nav.url);
                 else {
-                    var Component = nav.component
+                    const Component = nav.component
                     addTab({
                         key: nav.url,
                         title: nav.title,
@@ -91,6 +93,8 @@ export const NavDropdownMenu = forwardRef<HTMLDivElement, NavDropdownMenuProps>(
         )
     }
 )
+
+NavDropdownMenu.displayName = "NavDropdownMenu";
 
 interface NavCommandProps extends React.ComponentPropsWithoutRef<typeof CommandItem> {
     navKey: string;
@@ -115,7 +119,7 @@ export const NavCommand = forwardRef<HTMLDivElement, NavCommandProps>(
                 if (exists)
                     setActive(nav.url);
                 else {
-                    var Component = nav.component
+                    const Component = nav.component
                     addTab({
                         key: nav.url,
                         title: nav.title,
@@ -130,3 +134,5 @@ export const NavCommand = forwardRef<HTMLDivElement, NavCommandProps>(
         )
     }
 )
+
+NavCommand.displayName = "NavCommand";

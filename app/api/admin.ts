@@ -4,16 +4,20 @@ import bcrypt from "bcrypt";
 
 import { adminCache } from "@/lib/server/global-cache"
 
-export async function get(input: { [key: string]: any; }) {
+import { RequestModel, AdminModel } from "@/lib/models";
+
+export async function get(input: RequestModel<{ pageIndex: number, pageSize: number, name: string }>) {
+    const data = input.data;
+
     const where: Prisma.AdminWhereInput = {
-        ...(input.data.name ? { name: { contains: input.data.name } } : {}),
+        ...(data.name ? { name: { contains: data.name } } : {}),
     };
     const total = await prisma.admin.count({
         where
     });
 
-    if ((input.data.pageIndex - 1) * input.data.pageSize - total > 0) {
-        input.data.pageIndex = Math.floor(total / input.data.pageSize) + 1
+    if ((data.pageIndex - 1) * data.pageSize - total > 0) {
+        data.pageIndex = Math.floor(total / data.pageSize) + 1
     }
 
     const list = await prisma.admin.findMany({
@@ -26,15 +30,16 @@ export async function get(input: { [key: string]: any; }) {
             address: true,
         },
         where,
-        skip: (input.data.pageIndex - 1) * input.data.pageSize,
-        take: input.data.pageSize,
+        skip: (data.pageIndex - 1) * data.pageSize,
+        take: data.pageSize,
         orderBy: { id: 'desc' }
     })
 
-    return { result: 0, message: "successful", data: { total: total, pageIndex: input.data.pageIndex, list: list } };
+    return { result: 0, message: "successful", data: { total: total, pageIndex: data.pageIndex, list: list } };
 }
 
-export async function insert(input: { [key: string]: any; }) {
+export async function insert(input: RequestModel<AdminModel>) {
+
     const count = await prisma.admin.count({
         where: {
             name: input.data.name,
@@ -58,7 +63,7 @@ export async function insert(input: { [key: string]: any; }) {
                 },
             });
 
-            var adminRole: { adminId: number, roleId: number }[] = [];
+            const adminRole: { adminId: number, roleId: number }[] = [];
             input.data.roles.forEach((v: number) => {
                 adminRole.push({
                     adminId: ra.id,
@@ -75,7 +80,7 @@ export async function insert(input: { [key: string]: any; }) {
     }
 }
 
-export async function update(input: { [key: string]: any; }) {
+export async function update(input: RequestModel<AdminModel>) {
     if (input.data.id == 1) {
         return { result: 1, message: "fail" };
     }
@@ -89,7 +94,7 @@ export async function update(input: { [key: string]: any; }) {
         return { result: 1, message: "name-exists" };
     }
 
-    var adminRole: { adminId: number, roleId: number }[] = [];
+    const adminRole: { adminId: number, roleId: number }[] = [];
     input.data.roles.forEach((v: number) => {
         adminRole.push({
             adminId: input.data.id,
@@ -138,13 +143,13 @@ export async function update(input: { [key: string]: any; }) {
         return { result: 1, message: "fail" };
     }
 
-    if(adminCache.has(input.data.id)) {
+    if (adminCache.has(input.data.id)) {
         adminCache.del(input.data.id)
     }
     return { result: 0, message: "successful" };
 }
 
-export async function del(input: { [key: string]: any; }) {
+export async function del(input: RequestModel<{ id: number }>) {
     if (input.data.id == 1) {
         return { result: 1, message: "fail" };
     }
@@ -170,13 +175,13 @@ export async function del(input: { [key: string]: any; }) {
     }
 }
 
-export async function getAdminRole(input: { [key: string]: any; }) {
+export async function getAdminRole(input: RequestModel<{ id: number }>) {
     const list = await prisma.adminRole.findMany({
         where: {
             adminId: input.data.id
         }
     })
-    var roles: number[] = []
+    const roles: number[] = []
     list.forEach((v) => {
         roles.push(v.roleId)
     })

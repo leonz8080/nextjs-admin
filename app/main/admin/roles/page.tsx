@@ -35,14 +35,8 @@ import { Permission } from "@/config/permission"
 
 import { CheckboxItemsField, TextField, CommandField, TextareaField } from "@/components/common/form-field";
 import { request } from "@/lib/client/utils"
-
+import { RoleModel, PageModel } from "@/lib/models"
 import { useTranslations } from 'next-intl';
-
-interface Role {
-    id: number;
-    name: string;
-    permissions: string[];
-}
 
 export default function Roles() {
     const t = useTranslations();
@@ -54,15 +48,15 @@ export default function Roles() {
     const [totalRow, setTotalRow] = useState(0);
     const [pageIndex, setPageIndex] = useState(1);
     const [pageSize, setPageSize] = useState(10);
-    const [list, setList] = useState([]);
+    const [list, setList] = useState<RoleModel[]>([]);
 
     const [name, setName] = useState("");
     const [open, setOpen] = React.useState(false);
     const [operTyp, setOperTyp] = useState("insert");
     const [delOpen, setDelOpen] = React.useState(false);
-    var delId = React.useRef(0);
+    const delId = React.useRef(0);
 
-    const tableRef = useRef<DataTableRef<Role>>(null);
+    const tableRef = useRef<DataTableRef<RoleModel>>(null);
 
     const schema = useMemo(() => z.object({
         id: z.number(),
@@ -84,7 +78,7 @@ export default function Roles() {
     });
 
     async function get() {
-        var res = await request('getRoles', {
+        const res = await request<PageModel<RoleModel>>('getRoles', {
             name: name,
             pageIndex: pageIndex,
             pageSize: pageSize
@@ -114,10 +108,9 @@ export default function Roles() {
             toast.error(t("form-validation"))
             return
         }
-        return;
 
         try {
-            var res = await request('insertRole', form.getValues());
+            const res = await request('insertRole', form.getValues());
             if (res.result == 0) {
                 toast.success(t(res.message))
                 setOpen(false)
@@ -131,10 +124,10 @@ export default function Roles() {
 
     }
 
-    async function handleUpdate(role: Role) {
+    async function handleUpdate(role: RoleModel) {
         form.setValue("id", role.id);
         form.setValue("name", role.name);
-        var res = await request('getRolePermission', { id: role.id });
+        const res = await request<{ permissions: string[] }>('getRolePermission', { id: role.id });
         form.setValue("permissions", res.data?.permissions || []);
         setOperTyp('update');
         setOpen(true);
@@ -146,10 +139,9 @@ export default function Roles() {
             toast.error(t("form-validation"))
             return
         }
-        return;
 
         try {
-            var res = await request('updateRole', form.getValues());
+            const res = await request('updateRole', form.getValues());
             if (res.result == 0) {
                 toast.success(t(res.message))
                 setOpen(false)
@@ -168,8 +160,7 @@ export default function Roles() {
     }
 
     const del = useCallback(async () => {
-        return;
-        var res = await request('deleteRole', {
+        const res = await request('deleteRole', {
             id: delId.current
         });
 
@@ -193,7 +184,7 @@ export default function Roles() {
         setPageIndex(1);
     }, [setPageIndex, setPageSize]);
 
-    const columns: ColumnDef<Role>[] = [
+    const columns: ColumnDef<RoleModel>[] = [
         {
             accessorKey: "name",
             header: t('name'),
@@ -240,7 +231,7 @@ export default function Roles() {
                                 <span className="hidden lg:inline">{t('add-new')}</span>
                             </Button>
                         </div>
-                        <DataTable<Role> ref={tableRef} columns={columns} datas={list} />
+                        <DataTable<RoleModel> ref={tableRef} columns={columns} datas={list} />
                         <DataPagination totalRow={totalRow} pageIndex={pageIndex} pageSize={pageSize} toPage={toPage} changePageSize={changePageSize} />
                     </div>
                 </div>

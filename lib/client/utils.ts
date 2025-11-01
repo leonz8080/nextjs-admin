@@ -7,14 +7,16 @@ import * as routes from "@/config/pages"
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
+import { ResponseModel } from "../models";
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export async function request(
+export async function request<T = unknown>(
   url: string,
-  data: { [key: string]: any; }
-): Promise<{ result: number; message: string; data?: { [key: string]: any; } }> {
+  data: { [key: string]: unknown; }
+): Promise<ResponseModel<T>> {
   data = {
     url: url,
     data: { ...data }
@@ -24,7 +26,7 @@ export async function request(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
-  let re = await res.json();
+  const re: ResponseModel<T> = await res.json();
   if (re.result == 2) {
     window.location.href = "/login";
   }
@@ -37,7 +39,7 @@ export async function request(
 export async function download(
   url: string,
   fileName: string,
-  data: { [key: string]: any; }
+  data: { [key: string]: unknown; }
 ) {
   data = {
     url: url,

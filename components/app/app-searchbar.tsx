@@ -23,7 +23,7 @@ export function AppSearchBar() {
                     <CommandGroup heading={t("recommend")}>
                         {
                             [...navMap].map(([key, value]) => {
-                                var title = '';
+                                let title = '';
                                 for (const tit of value.titles) {
                                     if (title !== '') {
                                         title += '->';

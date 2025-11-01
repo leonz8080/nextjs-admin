@@ -20,17 +20,9 @@ import {
 import { useNoticeStore } from "@/hooks/use-global-store";
 import { DataTable, DataPagination, DataTableRef } from "@/components/common/data-table"
 import { request } from "@/lib/client/utils"
+import { NoticeModel, PageModel } from "@/lib/models"
 
 import { useTranslations } from 'next-intl';
-
-interface Notice {
-    id: number;
-    avatar: string;
-    title: string;
-    content: string;
-    status: number;
-    createAt: string;
-}
 
 export default function Notices() {
     const t = useTranslations();
@@ -40,14 +32,14 @@ export default function Notices() {
     const [totalRow, setTotalRow] = useState(0);
     const [pageIndex, setPageIndex] = useState(1);
     const [pageSize, setPageSize] = useState(10);
-    const [list, setList] = useState([]);
+    const [list, setList] = useState<NoticeModel[]>([]);
 
     const [name, setName] = useState("");
 
-    const tableRef = useRef<DataTableRef<Notice>>(null);
+    const tableRef = useRef<DataTableRef<NoticeModel>>(null);
 
     async function get() {
-        var res = await request('getNotices', {
+        const res = await request<PageModel<NoticeModel>>('getNotices', {
             name: name,
             pageIndex: pageIndex,
             pageSize: pageSize
@@ -75,7 +67,7 @@ export default function Notices() {
         get();
     }, [get, setPageIndex, setPageSize]);
 
-    const columns: ColumnDef<Notice>[] = [
+    const columns: ColumnDef<NoticeModel>[] = [
         {
             accessorKey: "name",
             header: t("title"),
@@ -123,7 +115,7 @@ export default function Notices() {
                             <span className="hidden lg:inline">{t("query")}</span>
                         </Button>
                     </div>
-                    <DataTable<Notice> ref={tableRef} columns={columns} datas={list} />
+                    <DataTable<NoticeModel> ref={tableRef} columns={columns} datas={list} />
                     <DataPagination totalRow={totalRow} pageIndex={pageIndex} pageSize={pageSize} toPage={toPage} changePageSize={changePageSize} />
                 </div>
             </div>

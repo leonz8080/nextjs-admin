@@ -2,12 +2,13 @@ import { prisma } from "../../lib/PrismaClient";
 import { Prisma } from "@prisma/client";
 
 import { querys } from "@/config/easy-query";
+import { RequestModel, EasyQueryModel } from "@/lib/models";
 
-type AnyRow = Record<string, any>;
+type AnyRow = Record<string, string | number | Date>;
 
-export async function query(input: { [key: string]: any; }) {
+export async function query(input: RequestModel<{ querys: EasyQueryModel[] }>) {
     const qs = input.data.querys
-    var result: any = {};
+    let result: { [key: string]: unknown; } = {};
 
     for (const q of qs) {
         const queryModel = querys.get(q.name);
@@ -24,7 +25,7 @@ export async function query(input: { [key: string]: any; }) {
         }
 
         const sql = buildSqlTemplate(queryModel.source, q.params || {});
-        debugSql(sql);
+        //debugSql(sql);
 
         try {
             const data = await prisma.$queryRaw<AnyRow[]>(sql);;
@@ -47,7 +48,7 @@ export async function query(input: { [key: string]: any; }) {
 
 export function buildSqlTemplate(
     template: string,
-    params: Record<string, any> = {}
+    params: Record<string, string | number> = {}
 ): Prisma.Sql {
     const regex = /\$\{(\w+)\}/g;
     const parts: (string | Prisma.Sql)[] = [];

@@ -62,7 +62,7 @@ export function AdminMenu() {
 
     async function logout() {
         try {
-            var res = await request('logout', {});
+            const res = await request('logout', {});
             if (res.result !== 0) {
                 toast.error(t(res.message));
                 return;
@@ -112,9 +112,8 @@ export function AdminMenu() {
             toast.error(t("form-validation"))
             return
         }
-        return;
         try {
-            var res = await request('updatePassword', pwdForm.getValues());
+            const res = await request('updatePassword', pwdForm.getValues());
             if (res.result == 0) {
                 toast.success(t(res.message))
                 setOpen(false)
@@ -128,7 +127,7 @@ export function AdminMenu() {
 
     async function handleGoogleAuth() {
         try {
-            var res = await request('getGoogleAuthQr', {});
+            const res = await request<{ binded: number, url: string }>('getGoogleAuthQr', {});
             if (res.result == 0 && res.data) {
                 setGoogleState({
                     binded: res.data.binded,
@@ -149,10 +148,9 @@ export function AdminMenu() {
             toast.error(t("form-validation"))
             return
         }
-        return;
 
         try {
-            var res = await request('verifyGoogleAuth', googleForm.getValues);
+            const res = await request('verifyGoogleAuth', googleForm.getValues());
             if (res.result == 0 && res.data) {
                 setGoogleState({
                     binded: 1,
@@ -169,9 +167,8 @@ export function AdminMenu() {
     }
 
     async function resetGoogleAuthQr() {
-        return;
         try {
-            var res = await request('resetGoogleAuthQr', {});
+            const res = await request<{ binded: number, url: string }>('resetGoogleAuthQr', {});
             if (res.result == 0 && res.data) {
                 setGoogleState({
                     binded: res.data.binded,
@@ -187,9 +184,8 @@ export function AdminMenu() {
     }
 
     async function cancelGoogleAuth() {
-        return;
         try {
-            var res = await request('cancelGoogleAuth', {});
+            const res = await request('cancelGoogleAuth', {});
             if (res.result == 0 && res.data) {
                 setGoogleState({
                     binded: 0,

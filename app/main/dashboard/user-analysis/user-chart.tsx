@@ -8,29 +8,22 @@ type EChartsOption = echarts.EChartsOption;
 
 import { useTranslations } from 'next-intl';
 
-export interface ChartDataModel {
-    month: string,
-    news: number,
-    retains: number,
-    returnRate: number
-}
-
-export function UserChart({ data }: { data: ChartDataModel[] }) {
+export function UserChart({ data }: { data: Record<string, string| number>[] }) {
     const t = useTranslations();
 
-    var month: string[] = [];
-    var news: number[] = [];
-    var retains: number[] = [];
-    var returnRate: number[] = [];
+    const month: string[] = [];
+    const news: number[] = [];
+    const retains: number[] = [];
+    const returnRate: number[] = [];
 
     data.forEach(v => {
-        month.push(v.month);
-        news.push(v.news);
-        retains.push(v.retains);
-        returnRate.push(v.returnRate);
+        month.push(String(v.month));
+        news.push(Number(v.news));
+        retains.push(Number(v.retains));
+        returnRate.push(Number(v.returnRate));
     });
 
-    var option: EChartsOption;
+    let option: EChartsOption;
 
     option = {
         grid: {

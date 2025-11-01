@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { useState, useMemo, useRef } from "react";
+import { ControllerRenderProps, FieldValues } from "react-hook-form";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -28,7 +29,7 @@ import { countryCodes } from "@/constants/country-codes";
 import { useTranslations } from 'next-intl';
 
 interface PhoneInputProps {
-    field: any;
+    field: ControllerRenderProps<FieldValues, string>;
     className?: string;
 }
 

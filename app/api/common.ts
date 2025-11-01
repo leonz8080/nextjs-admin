@@ -5,6 +5,8 @@ import { prisma } from "../../lib/PrismaClient";
 import { getConfig, configCache } from "../../lib/server/global-cache";
 import { Prisma } from "@prisma/client";
 
+import { RequestModel } from "@/lib/models";
+
 export async function upload(formData: FormData) {
     const file = formData.get("file") as File;
     if (!file) {
@@ -24,7 +26,7 @@ export async function upload(formData: FormData) {
     return { result: 0, message: "successful", data: { url: url } };
 }
 
-export async function getNotices(input: { [key: string]: any; }) {
+export async function getNotices(input: RequestModel<{ pageIndex: number, pageSize: number }>) {
     const where: Prisma.NoticesWhereInput = {
         sendTo: { in: [0, input.adminId] },
     };
@@ -54,18 +56,12 @@ export async function getNotices(input: { [key: string]: any; }) {
     return { result: 0, message: "successful", data: { total: total, pageIndex: input.data.pageIndex, list: list } };
 }
 
-export async function getNewNotices(input: { [key: string]: any; }) {
+export async function getNewNotices(input: RequestModel) {
     const where: Prisma.NoticesWhereInput = {
         sendTo: { in: [0, input.adminId] },
     };
 
     const list = await prisma.notices.findMany({
-        select: {
-            id: true,
-            avatar: true,
-            title: true,
-            content: true
-        },
         where,
         take: 3,
         orderBy: { id: 'desc' }
@@ -74,7 +70,7 @@ export async function getNewNotices(input: { [key: string]: any; }) {
     return { result: 0, message: "successful", data: { list: list } };
 }
 
-export async function getSysInfo(input: { [key: string]: any; }) {
+export async function getSysInfo(input: RequestModel) {
     return {
         result: 0,
         message: "successful",
@@ -86,7 +82,7 @@ export async function getSysInfo(input: { [key: string]: any; }) {
     };
 }
 
-export async function getAllConfig(input: { [key: string]: any; }) {
+export async function getAllConfig(input: RequestModel) {
     return {
         result: 0,
         message: "successful",
@@ -104,7 +100,7 @@ export async function getAllConfig(input: { [key: string]: any; }) {
     };
 }
 
-export async function getDefaultLanguage(input: { [key: string]: any; }) {
+export async function getDefaultLanguage(input: RequestModel) {
     return {
         result: 0,
         message: "successful",
@@ -114,7 +110,7 @@ export async function getDefaultLanguage(input: { [key: string]: any; }) {
     };
 }
 
-export async function updateConfig(input: { [key: string]: any; }) {
+export async function updateConfig(input: RequestModel<Record<string, string | number>>) {
     for (const key in input.data) {
         configCache.set(key, input.data[key]);
         await prisma.config.update({

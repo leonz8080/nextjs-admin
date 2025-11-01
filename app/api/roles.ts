@@ -2,8 +2,9 @@ import { prisma } from "../../lib/PrismaClient";
 import { Prisma } from "@prisma/client";
 
 import { adminCache } from "@/lib/server/global-cache"
+import { RequestModel } from "@/lib/models";
 
-export async function get(input: { [key: string]: any; }) {
+export async function get(input: RequestModel<{ pageIndex: number, pageSize: number, name: string }>) {
     const where: Prisma.RolesWhereInput = {
         ...(input.data.name ? { name: { contains: input.data.name } } : {}),
     };
@@ -25,7 +26,7 @@ export async function get(input: { [key: string]: any; }) {
     return { result: 0, message: "successful", data: { total: total, pageIndex: input.data.pageIndex, list: list } };
 }
 
-export async function insert(input: { [key: string]: any; }) {
+export async function insert(input: RequestModel<{ name: string, permissions: string[] }>) {
     const count = await prisma.roles.count({
         where: {
             name: input.data.name,
@@ -43,7 +44,7 @@ export async function insert(input: { [key: string]: any; }) {
                 },
             });
 
-            var rolePermission: { roleId: number, permission: string }[] = [];
+            const rolePermission: { roleId: number, permission: string }[] = [];
             input.data.permissions.forEach((v: string) => {
                 rolePermission.push({
                     roleId: ra.id,
@@ -60,7 +61,7 @@ export async function insert(input: { [key: string]: any; }) {
     }
 }
 
-export async function update(input: { [key: string]: any; }) {
+export async function update(input: RequestModel<{ id: number, name: string, permissions: string[] }>) {
     const role = await prisma.roles.findFirst({
         where: {
             name: input.data.name,
@@ -70,7 +71,7 @@ export async function update(input: { [key: string]: any; }) {
         return { result: 1, message: "name-exists" };
     }
 
-    var rolePermission: { roleId: number, permission: string }[] = [];
+    const rolePermission: { roleId: number, permission: string }[] = [];
     input.data.permissions.forEach((v: string) => {
         rolePermission.push({
             roleId: input.data.id,
@@ -102,7 +103,7 @@ export async function update(input: { [key: string]: any; }) {
     }
 }
 
-export async function del(input: { [key: string]: any; }) {
+export async function del(input: RequestModel<{ id: number }>) {
     try {
         await prisma.$transaction(async (tx) => {
             await tx.adminRole.deleteMany({
@@ -131,21 +132,21 @@ export async function del(input: { [key: string]: any; }) {
     }
 }
 
-export async function getRolePermission(input: { [key: string]: any; }) {
+export async function getRolePermission(input: RequestModel<{ id: number }>) {
     const rolePermission = await prisma.rolePermission.findMany({
         where: {
             roleId: input.data.id,
         },
     })
 
-    var permissions: string[] = [] 
+    const permissions: string[] = [] 
     rolePermission.forEach((v) => {
         permissions.push(v.permission)
     })
     return { result: 0, message: "successful", data: { permissions: permissions } };
 }
 
-export async function getAll(input: { [key: string]: any; }) {
+export async function getAll(input: RequestModel) {
     const list = await prisma.roles.findMany({
         where: {}
     })

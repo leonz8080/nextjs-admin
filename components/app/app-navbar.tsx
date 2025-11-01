@@ -17,7 +17,7 @@ export function AppNavbar() {
     const { permissions } = userPermissionsStore();
 
     useEffect(() => {
-        for (var i = 0; i < tabs.length; i++) {
+        for (let i = 0; i < tabs.length; i++) {
             if (!tabs[i].permissions || tabs[i].permissions.length == 0) {
                 continue;
             }

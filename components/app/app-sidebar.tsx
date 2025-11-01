@@ -31,9 +31,9 @@ interface SysInfoModel {
 }
 
 function filterPermissions(navs: NavModel[], permissions: string[]): NavModel[] {
-    var res: NavModel[] = [];
+    const res: NavModel[] = [];
 
-    for (var i = 0; i < navs.length; i++) {
+    for (let i = 0; i < navs.length; i++) {
         if (!navs[i].permissions || navs[i].permissions?.some(item => permissions.includes(item))) {
             res.push({
                 url: navs[i].url,
@@ -51,9 +51,9 @@ function filterPermissions(navs: NavModel[], permissions: string[]): NavModel[] 
 }
 
 function filterNull(navs: NavModel[]): NavModel[] {
-    var res: NavModel[] = [];
+    const res: NavModel[] = [];
 
-    for (var i = 0; i < navs.length; i++) {
+    for (let i = 0; i < navs.length; i++) {
         if (navs[i].component) {
             res.push({
                 url: navs[i].url,
@@ -65,7 +65,7 @@ function filterNull(navs: NavModel[]): NavModel[] {
             });
         }
         if ((navs[i].items?.length ?? 0) > 0) {
-            var items = filterNull(navs[i].items ?? []);
+            const items = filterNull(navs[i].items ?? []);
             if (items.length > 0) {
                 res.push({
                     url: navs[i].url,
@@ -89,7 +89,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const [menu, setMenu] = useState<NavModel[]>([]);
 
     async function getSysInfo() {
-        var res = await request('getSysInfo', {});
+        const res = await request<Record<string, string>>('getSysInfo', {});
         if (res.result === 0 && res.data) {
             setSysInfo({
                 name: res.data.name,
@@ -100,7 +100,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     }
 
     useEffect(() => {
-        var temp = filterPermissions(sidebarMenu, permissions);
+        let temp = filterPermissions(sidebarMenu, permissions);
         temp = filterNull(temp);
         setMenu(temp)
     }, [permissions]);
@@ -141,7 +141,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 }
             </SidebarContent>
             <SidebarFooter>
-                
+
             </SidebarFooter>
             <SidebarRail />
         </Sidebar>

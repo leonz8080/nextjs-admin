@@ -14,6 +14,7 @@ import { useUserInfoStore } from "@/hooks/use-global-store";
 import { TextField, PhoneField } from "@/components/common/form-field";
 import { AvatarCropUploader } from "@/components/common/avatar-crop-uploader";
 import { request } from "@/lib/client/utils"
+import { ProfileModel } from "@/lib/models";
 
 import { useTranslations } from 'next-intl';
 
@@ -51,7 +52,7 @@ export default function Profile() {
     });
 
     async function getAdmin() {
-        var res = await request('getAdmin', {});
+        const res = await request<ProfileModel>('getAdmin', {});
 
         if (res.result != 0 || !res.data) {
             toast.error(res.message)
@@ -81,9 +82,8 @@ export default function Profile() {
             toast.error(t("form-validation"))
             return
         }
-        return;
         try {
-            var res = await request('updateAdminBySelf', {
+            const res = await request<{ avatar: string }>('updateAdminBySelf', {
                 avatar: form.getValues().avatar,
                 email: form.getValues().email,
                 tele: form.getValues().tele.iso + " " + form.getValues().tele.code + ' ' + form.getValues().tele.number,

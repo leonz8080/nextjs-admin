@@ -352,7 +352,7 @@ export function CheckboxItemsField({ name, label, items, className }: CheckboxIt
                                             onCheckedChange={(checked) => {
                                                 const newValue = checked
                                                     ? [...field.value, item.id]
-                                                    : field.value.filter((id: any) => id !== item.id)
+                                                    : field.value.filter((id: number | string) => id !== item.id)
                                                 field.onChange(newValue)
                                             }}
                                         />

@@ -15,12 +15,12 @@ export interface FunnelDataModel {
 export function UserFunnel({ data }: { data: FunnelDataModel[] }) {
     const t = useTranslations();
 
-    var legends: string[] = [];
+    const legends: string[] = [];
     data.forEach(v => {
         legends.push(v.name);
     });
 
-    var option: EChartsOption;
+    let option: EChartsOption;
     option = {
         title: {
             text: t("user-funnel"),

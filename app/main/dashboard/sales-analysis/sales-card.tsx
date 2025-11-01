@@ -25,15 +25,15 @@ export interface CardDataModel {
 export function SalesCard({ data }: { data: CardDataModel }) {
     const t = useTranslations();
 
-    var IconMtm: LucideIcon = ArrowUp;
-    var colorMtm = 'text-green-600';
+    let IconMtm: LucideIcon = ArrowUp;
+    let colorMtm = 'text-green-600';
     if (data.mtm < 0) {
         IconMtm = ArrowDown;
         colorMtm = 'text-red-600';
     }
 
-    var IconYty: LucideIcon = ArrowUp;
-    var colorYty = 'text-green-600';
+    let IconYty: LucideIcon = ArrowUp;
+    let colorYty = 'text-green-600';
     if (data.yty < 0) {
         IconYty = ArrowDown;
         colorYty = 'text-red-600';

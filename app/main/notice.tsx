@@ -19,31 +19,24 @@ import { Separator } from "@/components/ui/separator"
 import { NavA } from "@/components/common/nav-wrap"
 import { request } from "@/lib/client/utils"
 import { useNoticeStore } from "@/hooks/use-global-store";
-
+import { NoticeModel } from "@/lib/models"
 import { useTranslations } from 'next-intl';
-
-interface Notices {
-    id: number;
-    avatar: string;
-    title: string;
-    content: string;
-}
 
 export function Notice() {
     const t = useTranslations();
 
     const { hasNews, setHasNews } = useNoticeStore();
-    const [notices, setNotices] = useState<Notices[]>([]);
+    const [notices, setNotices] = useState<NoticeModel[]>([]);
     const [open, setOpen] = useState(false);
 
     async function get() {
-        var res = await request('getNewNotices', {});
+        const res = await request<{ list: NoticeModel[] }>('getNewNotices', {});
         if (res.result != 0 || !res.data) {
             setNotices([])
             return
         }
 
-        for (var i = 0; i < res.data.list.length; i++) {
+        for (let i = 0; i < res.data.list.length; i++) {
             if (res.data.list[i].content.length > 20) {
                 res.data.list[i].content = res.data.list[i].content.substring(0, 20) + '...'
             }
@@ -68,7 +61,7 @@ export function Notice() {
                 return res.data.list;
             }
 
-            for (var i = 0; i < res.data.list.length; i++) {
+            for (let i = 0; i < res.data.list.length; i++) {
                 if (res.data.list[i].status == 0) {
                     shouldHasNews = true;
                     break;

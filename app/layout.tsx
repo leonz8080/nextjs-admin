@@ -20,10 +20,14 @@ export default function RootLayout({
 }>) {
   const { setLanguage, language } = useLanguageStore();
 
+  const isLanguage = (lang: string): lang is keyof typeof languages => {
+    return lang in languages;
+  };
+
   function getDefaultLanguage() {
-    request('getDefaultLanguage', {}).then((res) => {
+    request<{ sysLanguage: string }>('getDefaultLanguage', {}).then((res) => {
       if (res.result === 0 && res.data) {
-        var lang = res.data.sysLanguage;
+        let lang = res.data.sysLanguage;
         if (lang === 'browser') {
           if (typeof navigator !== 'undefined') {
             lang = navigator.language.toLowerCase();
@@ -31,13 +35,13 @@ export default function RootLayout({
               lang = lang.substring(0, lang.indexOf('-'));
             }
           }
-          if (lang in languages) {
+          if (isLanguage(lang)) {
             setLanguage(lang);
           } else {
             setLanguage('en');
           }
         } else {
-          if (lang in languages) {
+          if (isLanguage(lang)) {
             setLanguage(lang);
           } else {
             setLanguage('en');

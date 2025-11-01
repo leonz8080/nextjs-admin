@@ -146,7 +146,7 @@ export function DataPagination({
 }) {
     const t = useTranslations();
 
-    var pageCount = 0
+    let pageCount = 0
     if (totalRow > 0) {
         pageCount = Math.floor(totalRow / pageSize) + 1
     }

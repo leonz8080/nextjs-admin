@@ -22,7 +22,7 @@ export async function getAdmin(id: number): Promise<AdminModel | undefined> {
     }
 
     const result = await prisma.$queryRaw<{ permission: string }[]>`SELECT distinct b.permission FROM AdminRole a, RolePermission b WHERE a.adminId = ${admin.id} and a.roleId = b.roleId`;
-    let permissions: string[] = [];
+    const permissions: string[] = [];
     result.forEach((v) => {
       permissions.push(v.permission);
     });

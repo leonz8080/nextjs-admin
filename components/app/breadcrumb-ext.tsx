@@ -19,7 +19,7 @@ export function BreadcrumbExt() {
     const t = useTranslations();
 
     const treadcrumb = breadcrumbStateStore((state) => state.path);
-    let len = treadcrumb.length;
+    const len = treadcrumb.length;
 
     return (
         <Breadcrumb>

@@ -37,7 +37,11 @@ Nextjs Admin is a full-stack solution for a backend management system, employing
 │   └── use-global-store.ts  # Front State Manager
 ├── lib/                     # Utility functions / Common logic
 │   ├── client               # Front-end tools    
-│   └── server               # Server-side tools   
+│   ├── server               # Server-side tools   
+│   │   ├── global-cache.ts  # Server data caching
+│   │   ├── jwt.ts           # Token generation and verification tool
+│   │   └── time.ts          # Server time tool
+│   └── models.ts            # Data model
 ├── public/                  
 ├── .env                   
 └── middleware.ts

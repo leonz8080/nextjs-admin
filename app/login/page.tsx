@@ -54,7 +54,7 @@ export default function Login() {
             toast.error(t("form-validation"))
             return
         }
-        var res = await request('login', form.getValues());
+        const res = await request<{ name: string, avatar: string, permissions: string[] }>('login', form.getValues());
         if (res.result === 0 && res.data) {
             setUserInfo({ name: res.data.name, avatar: res.data.avatar })
             setUserPermissions(res.data.permissions)
@@ -129,7 +129,7 @@ export default function Login() {
                                                 {t("login")}
                                             </Button>
                                             <div className="text-center">
-                                                username: admin,    password: 123456 
+                                                username: admin,    password: 123456
                                             </div>
                                         </div>
                                     </div>

@@ -41,21 +41,7 @@ import { AvatarField, TextField, PhoneField, CheckboxItemsField } from "@/compon
 
 import { useTranslations } from 'next-intl';
 
-interface Admin {
-    id: number;
-    avatar: string;
-    name: string;
-    email: string;
-    tele: string;
-    address: string;
-    password: string;
-    roles: string[];
-}
-
-interface Role {
-    id: number;
-    name: string;
-}
+import { AdminModel, RoleModel, PageModel } from "@/lib/models";
 
 export default function AdminList() {
     const t = useTranslations();
@@ -63,16 +49,16 @@ export default function AdminList() {
     const [totalRow, setTotalRow] = useState(0);
     const [pageIndex, setPageIndex] = useState(1);
     const [pageSize, setPageSize] = useState(10);
-    const [list, setList] = useState([]);
+    const [list, setList] = useState<AdminModel[]>([]);
 
     const [name, setName] = useState("");
-    const [roles, setRoles] = useState<Role[]>([]);
+    const [roles, setRoles] = useState<RoleModel[]>([]);
     const [open, setOpen] = React.useState(false);
     const [operTyp, setOperTyp] = useState("insert");
     const [delOpen, setDelOpen] = React.useState(false);
-    var delId = React.useRef(0);
+    const delId = React.useRef(0);
 
-    const tableRef = useRef<DataTableRef<Admin>>(null);
+    const tableRef = useRef<DataTableRef<AdminModel>>(null);
 
     const schema = useMemo(() => z.object({
         id: z.number(),
@@ -120,7 +106,7 @@ export default function AdminList() {
     });
 
     async function get() {
-        var res = await request('getAdmins', {
+        const res = await request<PageModel<AdminModel>>('getAdmins', {
             name: name,
             pageIndex: pageIndex,
             pageSize: pageSize
@@ -145,7 +131,7 @@ export default function AdminList() {
         form.setValue("password", '');
         form.setValue("address", '');
         form.setValue("roles", []);
-        var res = await request('getAllRoles', {});
+        const res = await request<{ list: RoleModel[] }>('getAllRoles', {});
         setRoles(res.data?.list || []);
         setOperTyp('insert');
         setOpen(true);
@@ -158,10 +144,8 @@ export default function AdminList() {
             return
         }
 
-        return;
-
         try {
-            var res = await request('insertAdmin', {
+            const res = await request('insertAdmin', {
                 avatar: form.getValues().avatar,
                 name: form.getValues().name,
                 email: form.getValues().email,
@@ -182,7 +166,7 @@ export default function AdminList() {
         }
     }
 
-    async function handleUpdate(admin: Admin) {
+    async function handleUpdate(admin: AdminModel) {
         form.setValue("id", admin.id);
         form.setValue("avatar", admin.avatar);
         form.setValue("name", admin.name);
@@ -200,11 +184,12 @@ export default function AdminList() {
         }
         form.setValue("address", admin.address);
         form.setValue("password", '');
-        var res = await request('getAllRoles', {});
-        setRoles(res.data?.list || []);
-        var res = await request('getAdminRole', { id: admin.id });
-        form.setValue("roles", res.data?.roles || []);
+        const list = await request<{ list: RoleModel[] }>('getAllRoles', {});
+        setRoles(list.data?.list || []);
+        const roles = await request<{ roles: number[] }>('getAdminRole', { id: admin.id });
+        form.setValue("roles", roles.data?.roles || []);
         setOperTyp('update');
+        console.log(operTyp);
         setOpen(true);
     }
 
@@ -214,11 +199,9 @@ export default function AdminList() {
             toast.error(t("form-validation"))
             return
         }
-        
-        return;
 
         try {
-            var res = await request('updateAdmin', {
+            const res = await request('updateAdmin', {
                 id: form.getValues().id,
                 avatar: form.getValues().avatar,
                 name: form.getValues().name,
@@ -246,8 +229,7 @@ export default function AdminList() {
     }
 
     const del = useCallback(async () => {
-        return;
-        var res = await request('deleteAdmin', {
+        const res = await request('deleteAdmin', {
             id: delId.current
         });
 
@@ -271,7 +253,7 @@ export default function AdminList() {
         setPageIndex(1);
     }, [setPageIndex, setPageSize]);
 
-    const columns: ColumnDef<Admin>[] = [
+    const columns: ColumnDef<AdminModel>[] = [
         {
             accessorKey: "name",
             header: t("admin"),
@@ -355,7 +337,7 @@ export default function AdminList() {
                                 <span className="hidden lg:inline">{t("add-new")}</span>
                             </Button>
                         </div>
-                        <DataTable<Admin> ref={tableRef} columns={columns} datas={list} />
+                        <DataTable<AdminModel> ref={tableRef} columns={columns} datas={list} />
                         <DataPagination totalRow={totalRow} pageIndex={pageIndex} pageSize={pageSize} toPage={toPage} changePageSize={changePageSize} />
                     </div>
                 </div>

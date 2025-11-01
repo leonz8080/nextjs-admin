@@ -3,22 +3,22 @@
 import { useState, useEffect, useRef } from 'react';
 
 import { UserCard, CardDataModel } from "./user-card";
-import { UserChart, ChartDataModel } from "./user-chart";
-import { ChannelPie, PieDataModel } from "./channel-pie";
+import { UserChart } from "./user-chart";
+import { ChannelPie } from "./channel-pie";
 import { UserFunnel, FunnelDataModel } from "./user-funnel";
 import {
   Card,
 } from "@/components/ui/card"
 
 import { request } from "@/lib/client/utils"
-
+import { EasyQueryResModel } from "@/lib/models"
 import { useLocale, useTranslations } from 'next-intl';
 
 export default function UserAnalysis() {
   const t = useTranslations();
 
-  const [chartData, setChartData] = useState<ChartDataModel[]>([]);
-  const [pieData, setPieData] = useState<PieDataModel[]>([]);
+  const [chartData, setChartData] = useState<Record<string, string | number>[]>([]);
+  const [pieData, setPieData] = useState<Record<string, string | number>[]>([]);
 
   const userTotal: CardDataModel = {
     title: t("total-users"),
@@ -56,7 +56,7 @@ export default function UserAnalysis() {
   ]
 
   async function get() {
-    var res = await request('easyQuery', {
+    const res = await request<Record<string, EasyQueryResModel>>('easyQuery', {
       querys: [
         {
           name: 'getMonthUserAddUp',
@@ -77,10 +77,10 @@ export default function UserAnalysis() {
       return
     }
 
-    if (res.data.getMonthUserAddUp.result !== 1) {
+    if (res.data.getMonthUserAddUp.result !== 1 && Array.isArray(res.data.getMonthUserAddUp.data)) {
       setChartData(res.data.getMonthUserAddUp.data);
     }
-    if (res.data.getMonthUserAddUp.result !== 1) {
+    if (res.data.getMonthUserAddUp.result !== 1 && Array.isArray(res.data.getChannelAddUp.data)) {
       setPieData(res.data.getChannelAddUp.data);
     }
   }

@@ -9,8 +9,9 @@ import { authenticator } from 'otplib';
 import QRCode from 'qrcode';
 
 import { getConfig, adminCache } from "../../lib/server/global-cache";
+import { RequestModel, ProfileModel } from "@/lib/models";
 
-export async function login(input: { [key: string]: any; }) {
+export async function login(input: RequestModel<{ name: string, password: string }>) {
     const admin = await prisma.admin.findFirst({
         where: {
             name: input.data.name,
@@ -42,11 +43,11 @@ export async function login(input: { [key: string]: any; }) {
             res = NextResponse.json({ result: 0, message: "successful", data: { name: admin.name, avatar: admin.avatar, permissions: ['admin'] } });
         } else {
             const result = await prisma.$queryRaw<{ permission: string }[]>`SELECT distinct b.permission FROM AdminRole a, RolePermission b WHERE a.adminId = ${admin.id} and a.roleId = b.roleId`;
-            let permissions: string[] = [];
+            const permissions: string[] = [];
             result.forEach((v) => {
                 permissions.push(v.permission);
             });
-            
+
             adminCache.set(admin.id, {
                 jti: tokenData.jti,
                 tokenHash: tokenData.tokenHash,
@@ -66,7 +67,7 @@ export async function login(input: { [key: string]: any; }) {
     return res;
 }
 
-export async function logout(input: { [key: string]: any; }) {
+export async function logout(input: RequestModel) {
     await prisma.admin.update({
         where: { id: input.adminId },
         data: { jti: "", tokenHash: "" },
@@ -82,11 +83,11 @@ export async function logout(input: { [key: string]: any; }) {
     );
 }
 
-export async function checkToken(input: { [key: string]: any; }) {
+export async function checkToken(input: RequestModel) {
     return { result: 0, message: "successful" }
 }
 
-export async function updatePassword(input: { [key: string]: any; }) {
+export async function updatePassword(input: RequestModel<{ password: string, password1: string }>) {
     const admin = await prisma.admin.findFirst({
         where: {
             id: input.adminId,
@@ -111,7 +112,7 @@ export async function updatePassword(input: { [key: string]: any; }) {
     return { result: 0, message: "successful" };
 }
 
-export async function getAdmin(input: { [key: string]: any; }) {
+export async function getAdmin(input: RequestModel<{ name: string }>) {
     const admin = await prisma.admin.findFirst({
         where: {
             name: input.data.name,
@@ -135,8 +136,8 @@ export async function getAdmin(input: { [key: string]: any; }) {
     }
 }
 
-export async function updateAdminBySelf(input: { [key: string]: any; }) {
-    var avatar = '';
+export async function updateAdminBySelf(input: RequestModel<ProfileModel>) {
+    let avatar = '';
     if (input.data.avatar.startsWith('data:image/png;base64')) {
         const fileName = `${Date.now()}.png`;
         const dir = path.join(process.cwd(), "public", "uploads", "admin");
@@ -159,7 +160,7 @@ export async function updateAdminBySelf(input: { [key: string]: any; }) {
     return { result: 0, message: "successful", data: { avatar: avatar } };
 }
 
-export async function getGoogleAuthQr(input: { [key: string]: any; }) {
+export async function getGoogleAuthQr(input: RequestModel) {
     const admin = await prisma.admin.findFirst({
         where: {
             id: input.adminId,
@@ -174,7 +175,7 @@ export async function getGoogleAuthQr(input: { [key: string]: any; }) {
         return { result: 0, message: "successful", data: { binded: 1, url: '' } };
     }
 
-    var secret = '';
+    let secret = '';
     if (admin.googleSecret) {
         secret = admin.googleSecret
     } else {
@@ -188,16 +189,16 @@ export async function getGoogleAuthQr(input: { [key: string]: any; }) {
         });
     }
 
-    const otpauth = authenticator.keyuri(input.adminId, '/leonz8080/nextjs-admin', secret);
+    const otpauth = authenticator.keyuri(String(input.adminId), '/leonz8080/nextjs-admin', secret);
     const qrCodeDataURL = await QRCode.toDataURL(otpauth);
 
     return { result: 0, message: "successful", data: { binded: 0, url: qrCodeDataURL } };
 }
 
-export async function resetGoogleAuthQr(input: { [key: string]: any; }) {
+export async function resetGoogleAuthQr(input: RequestModel) {
     const secret = authenticator.generateSecret();
 
-    const otpauth = authenticator.keyuri(input.adminId, '/leonz8080/nextjs-admin', secret);
+    const otpauth = authenticator.keyuri(String(input.adminId), '/leonz8080/nextjs-admin', secret);
     const qrCodeDataURL = await QRCode.toDataURL(otpauth);
 
     await prisma.admin.update({
@@ -211,7 +212,7 @@ export async function resetGoogleAuthQr(input: { [key: string]: any; }) {
     return { result: 0, message: "successful", data: { binded: 0, url: qrCodeDataURL } };
 }
 
-export async function verifyGoogleAuth(input: { [key: string]: any; }) {
+export async function verifyGoogleAuth(input: RequestModel<{ code: string }>) {
     const admin = await prisma.admin.findFirst({
         where: {
             id: input.adminId,
@@ -234,7 +235,7 @@ export async function verifyGoogleAuth(input: { [key: string]: any; }) {
     return { result: 1, message: "fail" };
 }
 
-export async function cancelGoogleAuth(input: { [key: string]: any; }) {
+export async function cancelGoogleAuth(input: RequestModel) {
     await prisma.admin.update({
         where: { id: input.adminId },
         data: {

@@ -7,23 +7,17 @@ type EChartsOption = echarts.EChartsOption;
 
 import { useTranslations } from 'next-intl';
 
-export interface ChartDataModel {
-    month: string,
-    sales: number,
-    vipSales: number
-}
-
-export function SalesChart({ data }: { data: ChartDataModel[] }) {
+export function SalesChart({ data }: { data: Record<string, string | number>[] }) {
     const t = useTranslations();
 
-    var month: string[] = [];
-    var sales: any[] = [];
-    var vipSales: any[] = [];
+    const month: string[] = [];
+    const sales: number[] = [];
+    const vipSales: number[] = [];
 
     data.forEach(v => {
-        month.push(v.month);
-        sales.push(v.sales);
-        vipSales.push(v.vipSales);
+        month.push(String(v.month));
+        sales.push(Number(v.sales));
+        vipSales.push(Number(v.vipSales));
     });
 
     const rawData = [
@@ -54,7 +48,7 @@ export function SalesChart({ data }: { data: ChartDataModel[] }) {
         };
     });
 
-    var option: EChartsOption;
+    let option: EChartsOption;
 
     option = {
         title: {

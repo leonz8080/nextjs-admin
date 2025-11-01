@@ -10,7 +10,7 @@ import { useTranslations } from 'next-intl';
 export function CsatGauge({ data }: { data: number }) {
     const t = useTranslations();
 
-    var option: EChartsOption;
+    let option: EChartsOption;
 
     option = {
         title: {

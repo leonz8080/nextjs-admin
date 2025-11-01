@@ -5,7 +5,9 @@ import ExcelJS from 'exceljs'
 import * as fs from "fs";
 import path from "path";
 
-export async function get(input: { [key: string]: any; }) {
+import { RequestModel, UserModel } from "@/lib/models";
+
+export async function get(input: RequestModel<{ pageIndex: number, pageSize: number, name: string, level: string }>) {
     const where: Prisma.UsersWhereInput = {
         ...(input.data.level ? { level: input.data.level } : {}),
         ...(input.data.name ? { name: { contains: input.data.name } } : {}),
@@ -28,7 +30,7 @@ export async function get(input: { [key: string]: any; }) {
     return { result: 0, message: "successful", data: { total: total, pageIndex: input.data.pageIndex, list: list } };
 }
 
-export async function insert(input: { [key: string]: any; }) {
+export async function insert(input: RequestModel<UserModel>) {
     const count = await prisma.users.count({
         where: {
             name: input.data.name,
@@ -38,8 +40,9 @@ export async function insert(input: { [key: string]: any; }) {
         return { result: 1, message: "name-exists" };
     }
 
+    const { id, ...insertUser } = input.data;
     const res = await prisma.users.create({
-        data: input.data,
+        data: insertUser,
     });
     if (res) {
         return { result: 0, message: "successful" };
@@ -47,7 +50,7 @@ export async function insert(input: { [key: string]: any; }) {
     return { result: 1, message: "Fail!" };
 }
 
-export async function update(input: { [key: string]: any; }) {
+export async function update(input: RequestModel<{ id: number, value: string, column: string }>) {
     if(input.data.column === "name") {
         const count = await prisma.users.count({
             where: {
@@ -72,7 +75,7 @@ export async function update(input: { [key: string]: any; }) {
     return { result: 0, message: "successful" };
 }
 
-export async function del(input: { [key: string]: any; }) {
+export async function del(input: RequestModel<{ id: number[] }>) {
     const res = await prisma.users.deleteMany({
         where: {
             id: { in: input.data.id },
@@ -84,7 +87,7 @@ export async function del(input: { [key: string]: any; }) {
     return { result: 0, message: "successful" };
 }
 
-export async function exp(input: { [key: string]: any; }) {
+export async function exp(input: RequestModel<{ level: string, name: string }>) {
     const where: Prisma.UsersWhereInput = {
         ...(input.data.level ? { level: input.data.level } : {}),
         ...(input.data.name ? { name: { contains: input.data.name } } : {}),
@@ -121,7 +124,7 @@ export async function exp(input: { [key: string]: any; }) {
 
         const imagePath = path.join(process.cwd(), "public", v.avatar);
         if (fs.existsSync(imagePath)) {
-            var ext = path.extname(imagePath).slice(1)
+            let ext = path.extname(imagePath).slice(1)
             if (ext === "jpg") ext = "jpeg"; 
             if (ext === 'png' || ext === 'jpeg' || ext === 'gif') {
                 const imageId = workbook.addImage({

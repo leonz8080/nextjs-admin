@@ -29,7 +29,7 @@ export default function Setting() {
     const t = useTranslations();
 
     function getConfig() {
-        request("getAllConfig", {}).then((res) => {
+        request<Record<string, string>>("getAllConfig", {}).then((res) => {
             if (res.result === 0 && res.data) {
                 sysForm.setValue("sysName", res.data.sysName || "");
                 sysForm.setValue("sysLogo", res.data.sysLogo || "");
@@ -46,16 +46,15 @@ export default function Setting() {
         });
     }
 
-    async function updateConfig<T extends Record<string, any>>(form: UseFormReturn<T>) {
+    async function updateConfig<T extends Record<string, string | number>>(form: UseFormReturn<T>) {
         const result = await form.trigger();
         if (!result) {
             toast.error(t("form-validation"))
             return
         }
-        return;
 
         try {
-            var res = await request('updateConfig', form.getValues());
+            const res = await request('updateConfig', form.getValues());
             if (res.result == 0 && res.data) {
                 toast.success(t(res.message))
             } else {

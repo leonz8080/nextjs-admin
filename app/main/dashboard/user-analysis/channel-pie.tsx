@@ -9,23 +9,18 @@ type EChartsOption = echarts.EChartsOption;
 
 import { useTranslations, useLocale } from 'next-intl';
 
-export interface PieDataModel {
-    name: string,
-    value: number
-}
-
-export function ChannelPie({ data }: { data: PieDataModel[] }) {
+export function ChannelPie({ data }: { data: Record<string, string | number>[] }) {
     const t = useTranslations();
     const locale = useLocale();
 
     const translatedData = useMemo(() => (
         data.map(item => ({
             ...item,
-            name: t(item.name)
+            name: t(String(item.name))
         }))
     ), [data, t, locale]);
 
-    var option: EChartsOption;
+    let option: EChartsOption;
     option = {
         title: {
             text: t("user-source"),

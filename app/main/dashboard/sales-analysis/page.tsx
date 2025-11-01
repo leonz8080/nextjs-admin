@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 
 import { SalesGauge } from "./sales-gauge";
-import { SalesChart, ChartDataModel } from "./sales-chart";
+import { SalesChart } from "./sales-chart";
 import { SalesCard, CardDataModel } from "./sales-card";
 import { CsatGauge } from "./csat-gauge";
 import { CsatRadar } from "./csat-radar";
@@ -14,13 +14,13 @@ import {
 } from "@/components/ui/card"
 
 import { request } from "@/lib/client/utils"
-
+import { EasyQueryResModel } from "@/lib/models"
 import { useTranslations } from 'next-intl';
 
 export default function SalesAnalysis() {
     const t = useTranslations();
 
-    const [salesChart, setSalesChart] = useState<ChartDataModel[]>([]);
+    const [salesChart, setSalesChart] = useState<Record<string, string | number>[]>([]);
 
     const salesTotal: CardDataModel = {
         title: t("sales-revenue"),
@@ -61,7 +61,7 @@ export default function SalesAnalysis() {
     ]
 
     async function get() {
-        var res = await request('easyQuery', {
+        const res = await request<Record<string, EasyQueryResModel>>('easyQuery', {
             querys: [
                 {
                     name: 'getMonthSaleAddUp',
@@ -76,7 +76,7 @@ export default function SalesAnalysis() {
             return
         }
 
-        if (res.data.getMonthSaleAddUp.result !== 1) {
+        if (res.data.getMonthSaleAddUp.result !== 1 && Array.isArray(res.data.getMonthSaleAddUp.data)) {
             setSalesChart(res.data.getMonthSaleAddUp.data);
         }
     }

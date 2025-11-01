@@ -4,7 +4,7 @@ import { routes } from "@/config/route";
 import { getAdmin, getConfig } from "@/lib/server/global-cache";
 import { verifyToken, hashToken } from "@/lib/server/jwt";
 
-var routeCache: { [key: string]: any; } = {};
+const routeCache: { [key: string]: Function; } = {};
 
 export async function POST(req: Request) {
     const contentType = req.headers.get("content-type") || "";
@@ -19,7 +19,7 @@ export async function POST(req: Request) {
 }
 
 async function jsonRequest(req: Request) {
-    var input = await req.json();
+    let input = await req.json();
 
     const route = routes.get(input.url);
     if (!route) {
@@ -88,6 +88,9 @@ async function jsonRequest(req: Request) {
         }
 
         input.adminId = decoded.adminId;
+    } else{
+        input.adminId = 0;
+        input.permissions = [];
     }
 
     if (input.url in routeCache) {
@@ -99,12 +102,16 @@ async function jsonRequest(req: Request) {
         }
     }
 
-    const mod = await route.ts();
+    type RouteHandler = (input: unknown) => Promise<unknown>;
+    type ApiModule = Record<string, RouteHandler>;
+
+    const mod = await route.ts() as ApiModule;
     if (!mod || !(route.fun in mod)) {
         return NextResponse.json({ result: 1, message: "API-not-found" });
     }
-    routeCache[input.url] = mod[route.fun];
-    const res = await (mod as any)[route.fun](input);
+    const handler = mod[route.fun];
+    routeCache[input.url] = handler;
+    const res = await handler(input);
     if (res instanceof NextResponse) {
         return res;
     } else {
@@ -192,12 +199,16 @@ async function formDataRequest(req: Request) {
         }
     }
 
-    const mod = await route.ts();
+    type RouteHandler = (input: unknown) => Promise<unknown>;
+    type ApiModule = Record<string, RouteHandler>;
+
+    const mod = await route.ts() as ApiModule;
     if (!mod || !(route.fun in mod)) {
         return NextResponse.json({ result: 1, message: "API-not-found" });
     }
-    routeCache[String(formData.get("url"))] = mod[route.fun];
-    const res = await (mod as any)[route.fun](formData);
+    const handler = mod[route.fun];
+    routeCache[String(formData.get("url"))] = handler;
+    const res = handler(formData);
     if (res instanceof NextResponse) {
         return res;
     } else {
@@ -211,7 +222,7 @@ async function checkIp(req: Request) {
         req.headers.get("x-real-ip") ||
         "Unknown IP";
 
-    var ipWhitelist = (await getConfig("ipWhitelist"));
+    let ipWhitelist = (await getConfig("ipWhitelist"));
     ipWhitelist = ipWhitelist.replace(/\s+/g, '');
     if (ipWhitelist.length !== 0 && !ipWhitelist.split(",").includes(ip)) {
         return false

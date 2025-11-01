@@ -36,7 +36,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       const firstPage = navMap.get(firstPageUrl);
 
       if (firstPage) {
-        var Component = firstPage.component
+        const Component = firstPage.component
         addTab({
           key: firstPage.url,
           title: firstPage.title,
@@ -50,7 +50,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     }
 
     if (activeKey) {
-      var titles = navMap.get(activeKey)?.titles
+      const titles = navMap.get(activeKey)?.titles
       const setBreadcrumb = breadcrumbStateStore.getState().setBreadcrumb;
       if (titles)
         setBreadcrumb(titles);
