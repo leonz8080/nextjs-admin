@@ -4,7 +4,7 @@ import { routes } from "@/config/route";
 import { getAdmin, getConfig } from "@/lib/server/global-cache";
 import { verifyToken, hashToken } from "@/lib/server/jwt";
 
-const routeCache: Record<string, (...args: unknown[]) => unknown> = {};
+//const routeCache: Record<string, (...args: unknown[]) => unknown> = {};
 
 export async function POST(req: Request) {
     const contentType = req.headers.get("content-type") || "";
@@ -93,14 +93,14 @@ async function jsonRequest(req: Request) {
         input.permissions = [];
     }
 
-    if (input.url in routeCache) {
+    /*if (input.url in routeCache) {
         const res = await routeCache[input.url](input);
         if (res instanceof NextResponse) {
             return res;
         } else {
             return NextResponse.json(res);
         }
-    }
+    }*/
 
     type RouteHandler = (input: unknown) => Promise<unknown>;
     type ApiModule = Record<string, RouteHandler>;
@@ -110,7 +110,7 @@ async function jsonRequest(req: Request) {
         return NextResponse.json({ result: 1, message: "API-not-found" });
     }
     const handler = mod[route.fun];
-    routeCache[input.url] = handler;
+    //routeCache[input.url] = handler;
     const res = await handler(input);
     if (res instanceof NextResponse) {
         return res;
@@ -190,14 +190,14 @@ async function formDataRequest(req: Request) {
 
     formData.append('adminId', String(decoded.adminId));
 
-    if (String(formData.get("url")) in routeCache) {
+    /*if (String(formData.get("url")) in routeCache) {
         const res = await routeCache[String(formData.get("url"))](formData);
         if (res instanceof NextResponse) {
             return res;
         } else {
             return NextResponse.json(res);
         }
-    }
+    }*/
 
     type RouteHandler = (input: unknown) => Promise<unknown>;
     type ApiModule = Record<string, RouteHandler>;
@@ -207,7 +207,7 @@ async function formDataRequest(req: Request) {
         return NextResponse.json({ result: 1, message: "API-not-found" });
     }
     const handler = mod[route.fun];
-    routeCache[String(formData.get("url"))] = handler;
+    //routeCache[String(formData.get("url"))] = handler;
     const res = handler(formData);
     if (res instanceof NextResponse) {
         return res;
