@@ -142,7 +142,7 @@ export default function AdminList() {
             return
         }
 
-        if(process.env.NEXT_PUBLIC_EDITABLE==="true") return;
+        //if(process.env.NEXT_PUBLIC_EDITABLE==="false") return;
 
         try {
             const res = await request('insertAdmin', {
@@ -198,7 +198,7 @@ export default function AdminList() {
             toast.error(t("form-validation"))
             return
         }
-        if(process.env.NEXT_PUBLIC_EDITABLE==="true") return;
+        //if(process.env.NEXT_PUBLIC_EDITABLE==="false") return;
         try {
             const res = await request('updateAdmin', {
                 id: form.getValues().id,
@@ -228,7 +228,7 @@ export default function AdminList() {
     }
 
     const del = useCallback(async () => {
-        if(process.env.NEXT_PUBLIC_EDITABLE==="true") return;
+        //if(process.env.NEXT_PUBLIC_EDITABLE==="false") return;
         const res = await request('deleteAdmin', {
             id: delId.current
         });
