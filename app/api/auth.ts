@@ -11,7 +11,7 @@ import QRCode from 'qrcode';
 import { getConfig, adminCache } from "../../lib/server/global-cache";
 import { RequestModel, ProfileModel } from "@/lib/models";
 
-export async function login(input: RequestModel<{ name: string, password: string }>) {
+export async function login(input: RequestModel<{ name: string, password: string, googleCAPTCHA: string }>) {
     const admin = await prisma.admin.findFirst({
         where: {
             name: input.data.name,
