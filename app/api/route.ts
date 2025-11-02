@@ -4,17 +4,17 @@ import { routes } from "@/config/route";
 import { getAdmin, getConfig } from "@/lib/server/global-cache";
 import { verifyToken, hashToken } from "@/lib/server/jwt";
 
-const routeCache: Record<string, (...args: unknown[]) => unknown> = {};
+const routeCache: Record<string, (input: unknown) => Promise<Response | object>> = {};
 
 export async function POST(req: Request) {
     const contentType = req.headers.get("content-type") || "";
 
     if (contentType.includes("multipart/form-data")) {
-        return formDataRequest(req);
+        return await formDataRequest(req);
     }
 
     if (contentType.includes("application/json")) {
-        return jsonRequest(req);
+        return await jsonRequest(req);
     }
 
     return NextResponse.json(
@@ -22,7 +22,7 @@ export async function POST(req: Request) {
     );
 }
 
-async function jsonRequest(req: Request) {
+async function jsonRequest(req: Request): Promise<Response> {
     const input = await req.json();
 
     const route = routes.get(input.url);
@@ -99,31 +99,23 @@ async function jsonRequest(req: Request) {
 
     if (input.url in routeCache) {
         const res = await routeCache[input.url](input);
-        if (res instanceof NextResponse) {
-            return res;
-        } else {
-            return NextResponse.json(res);
-        }
+        return res instanceof NextResponse ? res : NextResponse.json(res);
     }
 
-    type RouteHandler = (input: unknown) => Promise<unknown>;
-    type ApiModule = Record<string, RouteHandler>;
+    type RouteHandler = (input: unknown) => Promise<Response | object>;
 
-    const mod = await route.ts() as ApiModule;
+    const mod = (await route.ts()) as Record<string, RouteHandler>;
     if (!mod || !(route.fun in mod)) {
         return NextResponse.json({ result: 1, message: "API-not-found" });
     }
     const handler = mod[route.fun];
     routeCache[input.url] = handler;
     const res = await handler(input);
-    if (res instanceof NextResponse) {
-        return res;
-    } else {
-        return NextResponse.json(res);
-    }
+
+    return res instanceof NextResponse ? res : NextResponse.json(res);
 }
 
-async function formDataRequest(req: Request) {
+async function formDataRequest(req: Request): Promise<Response> {
     const formData = await req.formData();
 
     const route = routes.get(formData.get("url") as string);
@@ -196,28 +188,19 @@ async function formDataRequest(req: Request) {
 
     if (String(formData.get("url")) in routeCache) {
         const res = await routeCache[String(formData.get("url"))](formData);
-        if (res instanceof NextResponse) {
-            return res;
-        } else {
-            return NextResponse.json(res);
-        }
+        return res instanceof NextResponse ? res : NextResponse.json(res);
     }
 
-    type RouteHandler = (input: unknown) => Promise<unknown>;
-    type ApiModule = Record<string, RouteHandler>;
+    type RouteHandler = (input: unknown) => Promise<Response | object>;
 
-    const mod = await route.ts() as ApiModule;
+    const mod = (await route.ts()) as Record<string, RouteHandler>;
     if (!mod || !(route.fun in mod)) {
         return NextResponse.json({ result: 1, message: "API-not-found" });
     }
     const handler = mod[route.fun];
     routeCache[String(formData.get("url"))] = handler;
-    const res = handler(formData);
-    if (res instanceof NextResponse) {
-        return res;
-    } else {
-        return NextResponse.json(res);
-    }
+    const res = await handler(formData);
+    return res instanceof NextResponse ? res : NextResponse.json(res);
 }
 
 async function checkIp(req: Request) {
