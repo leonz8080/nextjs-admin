@@ -43,8 +43,8 @@ export function UserChart({ data }: { data: Record<string, string| number>[] }) 
             feature: {
                 //dataView: { show: true, readOnly: false },
                 //magicType: { show: true, type: ['line', 'bar'] },
-                restore: { show: true },
-                saveAsImage: { show: true }
+                //restore: { show: true },
+                //saveAsImage: { show: true }
             }
         },
         legend: {

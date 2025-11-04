@@ -24,6 +24,14 @@ export async function login(input: RequestModel<{ name: string, password: string
     //const hashedPassword = await bcrypt.hash('123456', 10);
     //console.log(hashedPassword)
     const isMatch = await bcrypt.compare(input.data.password, admin.password);
+    if (!isMatch) {
+        return { result: 1, message: "error-username-password" };
+    }
+    if (admin.isBindGoogle === 1 && admin.googleSecret) {
+        if (!authenticator.check(input.data.googleCAPTCHA, admin.googleSecret)) {
+            return { result: 1, message: "error-google-CAPTCHA" };
+        }
+    }
 
     /*if(process.env.NEXT_PUBLIC_EDITABLE==="false") {
         const res = NextResponse.json({ result: 0, message: "successful", data: { name: admin.name, avatar: admin.avatar, permissions: ['admin'] } });
@@ -37,44 +45,40 @@ export async function login(input: RequestModel<{ name: string, password: string
     }*/
 
     let res;
-    if (isMatch) {
-        const expires = await getConfig("tokenExpiration");
-        const tokenData = generateToken(admin.id, parseInt(expires));
+    const expires = await getConfig("tokenExpiration");
+    const tokenData = generateToken(admin.id, parseInt(expires));
 
-        await prisma.admin.update({
-            where: { id: admin.id },
-            data: { jti: tokenData.jti, tokenHash: tokenData.tokenHash },
-        });
-        if (admin.name == 'admin') {
-            adminCache.set(admin.id, {
-                jti: tokenData.jti,
-                tokenHash: tokenData.tokenHash,
-                permissions: ['admin']
-            })
-            res = NextResponse.json({ result: 0, message: "successful", data: { name: admin.name, avatar: admin.avatar, permissions: ['admin'] } });
-        } else {
-            const result = await prisma.$queryRaw<{ permission: string }[]>`SELECT distinct b.permission FROM AdminRole a, RolePermission b WHERE a.adminId = ${admin.id} and a.roleId = b.roleId`;
-            const permissions: string[] = [];
-            result.forEach((v) => {
-                permissions.push(v.permission);
-            });
-
-            adminCache.set(admin.id, {
-                jti: tokenData.jti,
-                tokenHash: tokenData.tokenHash,
-                permissions: permissions
-            })
-            res = NextResponse.json({ result: 0, message: "successful", data: { name: admin.name, avatar: admin.avatar, permissions: permissions } });
-        }
-        res.cookies.set("token", tokenData.token, {
-            httpOnly: true,
-            secure: process.env.HTTPS_IS_REQUIRED==="true",
-            sameSite: "lax",
-            path: "/",
-        });
+    await prisma.admin.update({
+        where: { id: admin.id },
+        data: { jti: tokenData.jti, tokenHash: tokenData.tokenHash },
+    });
+    if (admin.name == 'admin') {
+        adminCache.set(admin.id, {
+            jti: tokenData.jti,
+            tokenHash: tokenData.tokenHash,
+            permissions: ['admin']
+        })
+        res = NextResponse.json({ result: 0, message: "successful", data: { name: admin.name, avatar: admin.avatar, permissions: ['admin'] } });
     } else {
-        res = { result: 1, message: "error-username-password" };
+        const result = await prisma.$queryRaw<{ permission: string }[]>`SELECT distinct b.permission FROM AdminRole a, RolePermission b WHERE a.adminId = ${admin.id} and a.roleId = b.roleId`;
+        const permissions: string[] = [];
+        result.forEach((v) => {
+            permissions.push(v.permission);
+        });
+
+        adminCache.set(admin.id, {
+            jti: tokenData.jti,
+            tokenHash: tokenData.tokenHash,
+            permissions: permissions
+        })
+        res = NextResponse.json({ result: 0, message: "successful", data: { name: admin.name, avatar: admin.avatar, permissions: permissions } });
     }
+    res.cookies.set("token", tokenData.token, {
+        httpOnly: true,
+        secure: process.env.HTTPS_IS_REQUIRED === "true",
+        sameSite: "lax",
+        path: "/",
+    });
     return res;
 }
 
@@ -201,7 +205,7 @@ export async function getGoogleAuthQr(input: RequestModel) {
         });
     }
 
-    const otpauth = authenticator.keyuri(String(input.adminId), '/leonz8080/nextjs-admin', secret);
+    const otpauth = authenticator.keyuri(admin.name, '/leonz8080/nextjs-admin', secret);
     const qrCodeDataURL = await QRCode.toDataURL(otpauth);
 
     return { result: 0, message: "successful", data: { binded: 0, url: qrCodeDataURL } };
@@ -241,10 +245,17 @@ export async function verifyGoogleAuth(input: RequestModel<{ code: string }>) {
 
     const isValid = authenticator.check(input.data.code, admin.googleSecret);
 
-    if (isValid) {
-        return { result: 0, message: "successful" };
+    if (!isValid) {
+        return { result: 1, message: "fail" };
     }
-    return { result: 1, message: "fail" };
+
+    await prisma.admin.update({
+        where: { id: input.adminId },
+        data: {
+            isBindGoogle: 1
+        },
+    });
+    return { result: 0, message: "successful" };
 }
 
 export async function cancelGoogleAuth(input: RequestModel) {

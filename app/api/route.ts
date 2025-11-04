@@ -67,7 +67,7 @@ async function jsonRequest(req: Request): Promise<Response> {
                 }
             );
         }
-        console.log(token);
+        
         const tokenHash = hashToken(token);
         const admin = await getAdmin(decoded.adminId);
         if (!admin || admin.jti !== decoded.jti || admin.tokenHash !== tokenHash) {

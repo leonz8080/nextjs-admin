@@ -220,7 +220,8 @@ export const languages = {
         "this": "this",
         "month": "month",
         "day": "day",
-        "compress-image": "Compressed images"
+        "compress-image": "Compressed images",
+        "error-google-CAPTCHA": "Google verification failed"
     },
     zh: {
         "username-is-required": "用户名为必填项",
@@ -432,7 +433,8 @@ export const languages = {
         "this": "本",
         "month": "月",
         "day": "日",
-        "compress-image": "压缩图片"
+        "compress-image": "压缩图片",
+        "error-google-CAPTCHA": "谷歌验证失败"
     },
     es: {
         "username-is-required": "El nombre de usuario es obligatorio",
@@ -644,7 +646,8 @@ export const languages = {
         "this": "este",
         "month": "mes",
         "day": "día",
-        "compress-image": "Imágenes comprimidas"
+        "compress-image": "Imágenes comprimidas",
+        "error-google-CAPTCHA": "Falló la verificación de Google."
     },
     fr: {
         "username-is-required": "Nom d'utilisateur requis",
@@ -856,7 +859,8 @@ export const languages = {
         "this": "ce",
         "month": "mois",
         "day": "jour",
-        "compress-image": "Images compressées"
+        "compress-image": "Images compressées",
+        "error-google-CAPTCHA": "La vérification Google a échoué"
     }
 } as const;
 

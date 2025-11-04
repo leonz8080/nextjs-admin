@@ -129,7 +129,7 @@ export function AdminMenu() {
     async function handleGoogleAuth() {
         try {
             const res = await request<{ binded: number, url: string }>('getGoogleAuthQr', {});
-            if (res.result == 0 && res.data) {
+            if (res.result === 0 && res.data) {
                 setGoogleState({
                     binded: res.data.binded,
                     url: res.data.url,
@@ -152,7 +152,7 @@ export function AdminMenu() {
         //if(process.env.NEXT_PUBLIC_EDITABLE==="false") return;
         try {
             const res = await request('verifyGoogleAuth', googleForm.getValues());
-            if (res.result == 0 && res.data) {
+            if (res.result === 0) {
                 setGoogleState({
                     binded: 1,
                     url: '',
@@ -169,9 +169,10 @@ export function AdminMenu() {
 
     async function resetGoogleAuthQr() {
         //if(process.env.NEXT_PUBLIC_EDITABLE==="false") return;
+        googleForm.setValue("code", "");
         try {
             const res = await request<{ binded: number, url: string }>('resetGoogleAuthQr', {});
-            if (res.result == 0 && res.data) {
+            if (res.result === 0 && res.data) {
                 setGoogleState({
                     binded: res.data.binded,
                     url: res.data.url,
@@ -189,13 +190,13 @@ export function AdminMenu() {
         //if(process.env.NEXT_PUBLIC_EDITABLE==="false") return;
         try {
             const res = await request('cancelGoogleAuth', {});
-            if (res.result == 0 && res.data) {
+            if (res.result === 0) {
                 setGoogleState({
                     binded: 0,
                     url: '',
                 });
-                toast.success(t(res.message))
                 setGoogleOpen(false)
+                toast.success(t(res.message))
             } else {
                 toast.error(t(res.message))
             }
