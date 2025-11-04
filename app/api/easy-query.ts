@@ -4,8 +4,6 @@ import { Prisma } from "@prisma/client";
 import { querys } from "@/config/easy-query";
 import { RequestModel, EasyQueryModel } from "@/lib/models";
 
-type AnyRow = Record<string, string | number | Date>;
-
 export async function query(input: RequestModel<{ querys: EasyQueryModel[] }>) {
     const qs = input.data.querys
     const result: { [key: string]: unknown; } = {};
@@ -28,7 +26,7 @@ export async function query(input: RequestModel<{ querys: EasyQueryModel[] }>) {
         //debugSql(sql);
 
         try {
-            const data = await prisma.$queryRaw<AnyRow[]>(sql);;
+            const data = await prisma.$queryRaw<Record<string, string | number | Date>[]>(sql);;
             if (queryModel.type === "table") {
                 result[q.name] = { result: 0, data: data };
             }

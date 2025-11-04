@@ -28,7 +28,7 @@ import { useTranslations } from 'next-intl';
 export default function Layout({ children }: { children: React.ReactNode }) {
   const t = useTranslations();
 
-  const { tabs, activeKey, setActive, removeTab, addTab } = useTabsStore();
+  const { tabs, activeKey, addTab } = useTabsStore();
   const { navMap } = navMapStore();
 
   useEffect(() => {

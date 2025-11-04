@@ -25,6 +25,17 @@ export async function login(input: RequestModel<{ name: string, password: string
     //console.log(hashedPassword)
     const isMatch = await bcrypt.compare(input.data.password, admin.password);
 
+    /*if(process.env.NEXT_PUBLIC_EDITABLE==="false") {
+        const res = NextResponse.json({ result: 0, message: "successful", data: { name: admin.name, avatar: admin.avatar, permissions: ['admin'] } });
+        res.cookies.set("token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbklkIjoxLCJqdGkiOiI3MmVjOTc3OS1iNGRiLTQwMWMtOGNlOC04MzZjMDk3MGY5OTMiLCJpYXQiOjE3NjIxMzY3NzN9.Ev9T6z1DaoHzQrGX_uUexzo6tK-neCu7xnQueJnATPc", {
+            httpOnly: true,
+            secure: false,
+            sameSite: "lax",
+            path: "/",
+        });
+        return res;
+    }*/
+
     let res;
     if (isMatch) {
         const expires = await getConfig("tokenExpiration");
@@ -57,7 +68,7 @@ export async function login(input: RequestModel<{ name: string, password: string
         }
         res.cookies.set("token", tokenData.token, {
             httpOnly: true,
-            secure: true,
+            secure: process.env.HTTPS_IS_REQUIRED==="true",
             sameSite: "lax",
             path: "/",
         });
@@ -68,6 +79,7 @@ export async function login(input: RequestModel<{ name: string, password: string
 }
 
 export async function logout(input: RequestModel) {
+    //if(process.env.NEXT_PUBLIC_EDITABLE==="false") return NextResponse.json( { result: 0, message: "successful" }, { status: 200, headers: { "Set-Cookie": "token=; Path=/; HttpOnly; Max-Age=0"},});
     await prisma.admin.update({
         where: { id: input.adminId },
         data: { jti: "", tokenHash: "" },
