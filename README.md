@@ -2,6 +2,8 @@
 
 Nextjs Admin is a full-stack solution for a backend management system, employing the SSR (Server-Side Response) architecture. designed to allow developers to quickly develop their own backend management systems based on this template.<br/>
 
+The golang branch retains the same functionality but replaces the server-side code with Go.<br/>
+
 The demo site has all data update functions disabled, but the source code can be updated normally.
 
 ## 📦 Features
